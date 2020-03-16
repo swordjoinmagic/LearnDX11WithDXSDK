@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\D3DFrameWork">
+      <UniqueIdentifier>{0a8821b9-f6ae-4270-a512-da7d6a4818b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Utils">
+      <UniqueIdentifier>{f2ee7955-2526-46a3-8a64-9b192f6471b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\D3DFrameWork">
+      <UniqueIdentifier>{9f86b1eb-2059-45a1-a1e3-0f26d802fa16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Utils">
+      <UniqueIdentifier>{2ea4f254-19dc-42a9-af54-f0d2bb07be68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Component">
+      <UniqueIdentifier>{65929cc4-3efd-4251-8fc5-b687bbefe062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Component">
+      <UniqueIdentifier>{109f96f0-5fd4-4dbb-8f22-120476fb2a9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Sample">
+      <UniqueIdentifier>{62f8ba62-67bb-481b-8cdd-f98fb9ef4c2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Sample">
+      <UniqueIdentifier>{c2e8e0af-3757-403b-8a49-0b8f021855fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{ea179cc5-e677-4b53-9b4a-10d09eacf7d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Common">
+      <UniqueIdentifier>{74e0650a-ac86-4e9f-aa1f-3d41312076a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="effect">
+      <UniqueIdentifier>{75a30067-7583-49aa-8321-c0f1e2ce9543}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectXTex">
+      <UniqueIdentifier>{4831e3dd-13f8-4a99-8531-72d4394d5df7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Sample1 CubeMap">
+      <UniqueIdentifier>{e444c270-1e04-49b6-9393-4ce365b3de46}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="d3dApp.cpp">
+      <Filter>源文件\D3DFrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DUtils.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="MathF.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>源文件\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="InitDirect3DApp.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>源文件\D3DFrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>源文件\D3DFrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample1_Cube.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>源文件\D3DFrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample2_SkyBox.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>源文件\D3DFrameWork</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="d3dApp.h">
+      <Filter>头文件\D3DFrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DUtils.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="MathF.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>头文件\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="InitDirect3DApp.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>头文件\D3DFrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>头文件\D3DFrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultVertex.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryGenerator.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample1_Cube.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="effect\d3dx11effect.h">
+      <Filter>effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>头文件\D3DFrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample2_SkyBox.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>头文件\D3DFrameWork</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shader\Common\WhiteObject.fx">
+      <Filter>Shader\Common</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample1 CubeMap\skyBox.fx">
+      <Filter>Shader\Sample1 CubeMap</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Common\textureMap.fx">
+      <Filter>Shader\Common</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample1 CubeMap\cubeMap.fx">
+      <Filter>Shader\Sample1 CubeMap</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
