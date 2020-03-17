@@ -6,11 +6,12 @@
 #include "InitDirect3DApp.h"
 #include "Sample1_Cube.h"
 #include "Sample2_SkyBox.h"
+#include "Sample3_Light.h"
 
 int main()
 {
 	HINSTANCE hInstance = GetModuleHandle(0);
-	Sample2 sample(hInstance);
+	Sample3 sample(hInstance);
 	if (!sample.Init()) {
 		std::cout << "应用程序初始化错误!!!" << std::endl;
 	}

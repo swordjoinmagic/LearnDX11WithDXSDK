@@ -13,7 +13,7 @@ private:
 public:
 	// 从文件中加载,根据给定的BindFlag,自动创建对应资源视图
 	// 默认创建着色器资源视图
-	Texture2D(ID3D11Device* device,const std::wstring& path,D3D11_BIND_FLAG bindFlag);
+	Texture2D(ID3D11Device* device,const std::wstring& path,D3D11_BIND_FLAG bindFlag=D3D11_BIND_SHADER_RESOURCE);
 	// 自定义纹理
 	Texture2D(ID3D11Device* device,D3D11_TEXTURE2D_DESC textureDesc);
 

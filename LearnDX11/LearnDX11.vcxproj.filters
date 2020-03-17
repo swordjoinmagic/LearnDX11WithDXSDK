@@ -52,6 +52,9 @@
     <Filter Include="Shader\Sample1 CubeMap">
       <UniqueIdentifier>{e444c270-1e04-49b6-9393-4ce365b3de46}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Sample2 Light">
+      <UniqueIdentifier>{2fc80153-143c-450b-a9c8-73065dd58924}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d3dApp.cpp">
@@ -92,6 +95,9 @@
     </ClCompile>
     <ClCompile Include="CubeMap.cpp">
       <Filter>源文件\D3DFrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample3_Light.cpp">
+      <Filter>源文件\Sample</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +146,12 @@
     <ClInclude Include="CubeMap.h">
       <Filter>头文件\D3DFrameWork</Filter>
     </ClInclude>
+    <ClInclude Include="Sample3_Light.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>头文件\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\Common\WhiteObject.fx">
@@ -153,6 +165,12 @@
     </FxCompile>
     <FxCompile Include="Shader\Sample1 CubeMap\cubeMap.fx">
       <Filter>Shader\Sample1 CubeMap</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample2 Light\pointLight.hlsl">
+      <Filter>Shader\Sample2 Light</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample2 Light\spotLight.fx">
+      <Filter>Shader\Sample2 Light</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
