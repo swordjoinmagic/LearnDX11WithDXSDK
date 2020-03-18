@@ -55,6 +55,9 @@
     <Filter Include="Shader\Sample2 Light">
       <UniqueIdentifier>{2fc80153-143c-450b-a9c8-73065dd58924}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Sample3 ShadowMap">
+      <UniqueIdentifier>{56392800-0624-4380-a4c5-42b0bde144df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d3dApp.cpp">
@@ -97,6 +100,9 @@
       <Filter>源文件\D3DFrameWork</Filter>
     </ClCompile>
     <ClCompile Include="Sample3_Light.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample4_PointShadow.cpp">
       <Filter>源文件\Sample</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,6 +158,9 @@
     <ClInclude Include="Light.h">
       <Filter>头文件\Component</Filter>
     </ClInclude>
+    <ClInclude Include="Sample4_PointShadow.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\Common\WhiteObject.fx">
@@ -171,6 +180,12 @@
     </FxCompile>
     <FxCompile Include="Shader\Sample2 Light\spotLight.fx">
       <Filter>Shader\Sample2 Light</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample3 ShadowMap\createPointLightShadow.fx">
+      <Filter>Shader\Sample3 ShadowMap</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample3 ShadowMap\shadow.fx">
+      <Filter>Shader\Sample3 ShadowMap</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

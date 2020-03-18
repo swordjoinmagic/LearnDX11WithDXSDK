@@ -34,7 +34,7 @@ v2f vert(a2v v){
 }
 
 float4 pixel(v2f i) : SV_Target{
-    return skyBox.Sample(state1,i.uv.xyz);
+    return skyBox.Sample(state1,i.uv.xyz).rrra;
 }
 
 technique11{

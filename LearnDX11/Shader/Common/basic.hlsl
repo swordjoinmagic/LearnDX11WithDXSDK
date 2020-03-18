@@ -22,6 +22,11 @@ struct appdata_img{
     float3 vertex : POSITION;
     float2 texcoord : TEXCOORD0;
 };
+// 一般用于渲染阴影时的顶点输入结构,仅有顶点位置属性
+struct appdata_vertex{
+    float3 vertex : POSITION;
+};
+
 // 一般用于后处理的顶点输出结构
 struct vertexOut_img{
     float4 pos : SV_Position;

@@ -78,3 +78,4 @@ void Sample3::Render() {
 	spotLightShader->SetShaderResource("mainTex",texture->GetSRV().Get());
 	boxMesh->Draw(spotLightShader,md3dImmediateContext.Get());
 }
+

@@ -47,7 +47,7 @@ float4 pixel(vertexOut i) : SV_Target{
     float3 specu = ProcessPointLightSpecWithLambert(pointLight,i.worldNormal,viewPos,i.worldPos,32) * float3(1,1,1);    
 
     float3 albedo = diff * mainTex.Sample(state1,i.uv).rgb;
-    float3 ambient = albedo * 0.1;
+    float3 ambient = mainTex.Sample(state1,i.uv).rgb * 0.1;
 
     float3 finalColor = albedo + specu + ambient;
 

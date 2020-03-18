@@ -7,11 +7,12 @@
 #include "Sample1_Cube.h"
 #include "Sample2_SkyBox.h"
 #include "Sample3_Light.h"
+#include "Sample4_PointShadow.h"
 
 int main()
 {
 	HINSTANCE hInstance = GetModuleHandle(0);
-	Sample3 sample(hInstance);
+	Sample4 sample(hInstance);
 	if (!sample.Init()) {
 		std::cout << "应用程序初始化错误!!!" << std::endl;
 	}
