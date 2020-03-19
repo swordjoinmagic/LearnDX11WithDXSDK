@@ -1,5 +1,7 @@
 #pragma once
 #include "D3DUtils.h"
+#include "Texture2D.h"
+#include "CubeMap.h"
 
 /*
 	着色器类,用于封装着色器操作,封装有下列操作:
@@ -34,6 +36,10 @@ public:
 	void SetVector(const std::string& paramName, XMVECTOR &value);
 	void SetRawValue(const std::string& paramName, const void *pData, uint size);
 	void SetShaderResource(const std::string& paramName, ID3D11ShaderResourceView* value);
+
+	void SetTexture2D(const std::string& paramName,std::shared_ptr<Texture2D> texture2D);
+	void SetCubeMap(const std::string& paramName, std::shared_ptr<CubeMap> cubeMap);
+
 #pragma endregion
 
 	// 获得当前Shader的pass数量

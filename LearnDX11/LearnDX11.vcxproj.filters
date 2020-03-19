@@ -58,6 +58,9 @@
     <Filter Include="Shader\Sample3 ShadowMap">
       <UniqueIdentifier>{56392800-0624-4380-a4c5-42b0bde144df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Sample4 Deffered">
+      <UniqueIdentifier>{0c08735f-6232-448d-acc5-4baa36b8129b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d3dApp.cpp">
@@ -103,6 +106,9 @@
       <Filter>源文件\Sample</Filter>
     </ClCompile>
     <ClCompile Include="Sample4_PointShadow.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample5_Deffered.cpp">
       <Filter>源文件\Sample</Filter>
     </ClCompile>
   </ItemGroup>
@@ -161,6 +167,9 @@
     <ClInclude Include="Sample4_PointShadow.h">
       <Filter>头文件\Sample</Filter>
     </ClInclude>
+    <ClInclude Include="Sample5_Deffered.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\Common\WhiteObject.fx">
@@ -186,6 +195,12 @@
     </FxCompile>
     <FxCompile Include="Shader\Sample3 ShadowMap\shadow.fx">
       <Filter>Shader\Sample3 ShadowMap</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample4 Deffered\renderGBuffer.fx">
+      <Filter>Shader\Sample4 Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample4 Deffered\defferedWithoutLightVloume.fx">
+      <Filter>Shader\Sample4 Deffered</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

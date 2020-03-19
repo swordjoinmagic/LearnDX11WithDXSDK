@@ -74,6 +74,15 @@ void Shader::SetShaderResource(const std::string& paramName, ID3D11ShaderResourc
 	HR(effect->GetVariableByName(paramName.c_str())->AsShaderResource()->SetResource(value));
 }
 
+void Shader::SetTexture2D(const std::string& paramName,std::shared_ptr<Texture2D> texture2D) {
+	SetShaderResource(paramName,texture2D->GetSRV().Get());
+}
+void Shader::SetCubeMap(const std::string& paramName, std::shared_ptr<CubeMap> cubeMap) {
+	SetShaderResource(paramName, cubeMap->GetSRV().Get());
+}
+
+
+
 uint Shader::GetPassCount() const{
 	return passCount;
 }

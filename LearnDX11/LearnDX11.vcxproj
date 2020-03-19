@@ -196,6 +196,7 @@
     <ClCompile Include="Sample2_SkyBox.cpp" />
     <ClCompile Include="Sample3_Light.cpp" />
     <ClCompile Include="Sample4_PointShadow.cpp" />
+    <ClCompile Include="Sample5_Deffered.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture2D.cpp" />
   </ItemGroup>
@@ -216,6 +217,7 @@
     <ClInclude Include="Sample2_SkyBox.h" />
     <ClInclude Include="Sample3_Light.h" />
     <ClInclude Include="Sample4_PointShadow.h" />
+    <ClInclude Include="Sample5_Deffered.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture2D.h" />
   </ItemGroup>
@@ -250,6 +252,8 @@
     <FxCompile Include="Shader\Sample2 Light\spotLight.fx" />
     <FxCompile Include="Shader\Sample3 ShadowMap\createPointLightShadow.fx" />
     <FxCompile Include="Shader\Sample3 ShadowMap\shadow.fx" />
+    <FxCompile Include="Shader\Sample4 Deffered\defferedWithoutLightVloume.fx" />
+    <FxCompile Include="Shader\Sample4 Deffered\renderGBuffer.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

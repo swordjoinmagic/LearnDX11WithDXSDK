@@ -367,4 +367,20 @@ public:
 
 		return std::make_shared<Mesh>(vertices,indices);
 	}
+
+	static std::shared_ptr<Mesh> CreateQuad(float size = 2) {
+		std::vector<DefaultVertex> v(6);
+		float unit = size / 2;
+		v[0] = DefaultVertex(float3(-unit, unit, 0), float3(0, 0, -1), float3(1, 0, 0), float2(0, 1));
+		v[1] = DefaultVertex(float3(unit, -unit, 0), float3(0, 0, -1), float3(1, 0, 0), float2(1, 0));
+		v[2] = DefaultVertex(float3(-unit, -unit, 0), float3(0, 0, -1), float3(1, 0, 0), float2(0, 0));
+		v[3] = DefaultVertex(float3(-unit, unit, 0), float3(0, 0, -1), float3(1, 0, 0), float2(0, 1));
+		v[4] = DefaultVertex(float3(unit, unit, 0), float3(0, 0, -1), float3(1, 0, 0), float2(1, 1));
+		v[5] = DefaultVertex(float3(unit, -unit, 0), float3(0, 0, -1), float3(1, 0, 0), float2(1, 0));
+
+		std::vector<uint> indices(6);
+		for (int i = 0; i < 6; i++) indices[i] = i;
+
+		return std::make_shared<Mesh>(v, indices);
+	}
 };

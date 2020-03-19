@@ -8,11 +8,12 @@
 #include "Sample2_SkyBox.h"
 #include "Sample3_Light.h"
 #include "Sample4_PointShadow.h"
+#include "Sample5_Deffered.h"
 
 int main()
 {
 	HINSTANCE hInstance = GetModuleHandle(0);
-	Sample4 sample(hInstance);
+	Sample5 sample(hInstance);
 	if (!sample.Init()) {
 		std::cout << "应用程序初始化错误!!!" << std::endl;
 	}
