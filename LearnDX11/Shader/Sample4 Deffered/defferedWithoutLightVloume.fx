@@ -7,8 +7,8 @@
 #include "../Common/Light.hlsl"
 
 cbuffer cbPerObject{
-    PointLight pointLight;
     float3 viewPos;
+    PointLight pointLight[100];
 };
 
 Texture2D gWorldPosTex;
@@ -34,15 +34,21 @@ float4 pixel(vertexOut_img i) : SV_Target{
     float4 albedoGloss = gAlbedoGloss.Sample(state,i.uv);
     float gloss = albedoGloss.w;
     float3 texColor = albedoGloss.xyz;
-
-    float diff = ProcessPointLightDiffuseWithLambert(pointLight,worldNormal,worldPos);
-    float specu = ProcessPointLightSpecWithLambert(pointLight,worldNormal,viewPos,worldPos,gloss);
-
-    float3 diffuseColor = diff * texColor * pointLight.lightColor;
-    float3 specularColor = specu * pointLight.lightColor;
     float3 ambient = texColor * 0.1;
+    
+    float3 finalColor = float3(0,0,0);
 
-    return float4(diffuseColor+specularColor+ambient,1.0);
+    for(int i=0;i<100;i++){
+        float diff = ProcessPointLightDiffuseWithLambert(pointLight[i],worldNormal,worldPos);
+        float specu = ProcessPointLightSpecWithLambert(pointLight[i],worldNormal,viewPos,worldPos,gloss);
+
+        float3 diffuseColor = diff * texColor * pointLight[i].lightColor;
+        float3 specularColor = specu * pointLight[i].lightColor;
+
+        finalColor += diffuseColor + specularColor;
+    }
+
+    return float4(finalColor,1.0);
 }
 
 technique11 DefferedTech{

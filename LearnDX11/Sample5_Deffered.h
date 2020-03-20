@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "d3dApp.h"
 #include "Mesh.h"
@@ -9,24 +9,24 @@
 class Sample5 : public D3DApp {
 private:
 
-	// GBufferÎÆÀíµÄ¿í¸ß
+	// GBufferçº¹ç†çš„å®½é«˜
 	uint textureWidth, textureHeight;
-	// GBufferµÄÊıÁ¿
+	// GBufferçš„æ•°é‡
 	uint bufferCount;
 
-	// ´æ´¢ÎïÌåµÄ
-	// ÊÀ½ç×ø±ê/·¨Ïß/Âş·´ÉäÑÕÉ«·ÖÁ¿ºÍ¸ß¹â·´Éä¹â»¬¶È(µÚËÄ¸ö·ÖÁ¿)
-	// µÄGBuffer¼¯ºÏ
+	// å­˜å‚¨ç‰©ä½“çš„
+	// ä¸–ç•Œåæ ‡/æ³•çº¿/æ¼«åå°„é¢œè‰²åˆ†é‡å’Œé«˜å…‰åå°„å…‰æ»‘åº¦(ç¬¬å››ä¸ªåˆ†é‡)
+	// çš„GBufferé›†åˆ
 	std::vector<ComPtr<ID3D11Texture2D>> gBuffers;
-	// gBufferµÄRTV¼¯ºÏ,Ë³ĞòÎªpos,normal,albedo
+	// gBufferçš„RTVé›†åˆ,é¡ºåºä¸ºpos,normal,albedo
 	std::vector<ComPtr<ID3D11RenderTargetView>> gBufferRTVs;
 	std::vector<ComPtr<ID3D11ShaderResourceView>> gBufferSRVs;
 
-	// äÖÈ¾GBufferËùĞèµÄÉî¶ÈÌùÍ¼
+	// æ¸²æŸ“GBufferæ‰€éœ€çš„æ·±åº¦è´´å›¾
 	ComPtr<ID3D11Texture2D> depthTex;
 	ComPtr<ID3D11DepthStencilView> depthTexDSV;
 
-	// äÖÈ¾GBufferÊ¹ÓÃµÄÊÓ¿Ú
+	// æ¸²æŸ“GBufferä½¿ç”¨çš„è§†å£
 	D3D11_VIEWPORT viewPort;
 
 	std::shared_ptr<Mesh> boxMesh;
@@ -40,7 +40,22 @@ private:
 	std::shared_ptr<Shader> textureMapShader;
 	std::shared_ptr<Shader> whiteObjectShader;
 
+	std::shared_ptr<Mesh> sphereMesh;
+
 	PointLight pointLight;
+
+	std::vector<PointLight> pointLights;
+	std::vector<float> lightVloumes;
+	const uint pointLightCount = 100;
+	std::shared_ptr<Shader> defferdShaderLightVloume;
+
+	ComPtr<ID3D11BlendState> blendState;
+
+	std::shared_ptr<Shader> colorObjectShader;
+
+	ComPtr<ID3D11DepthStencilState> depthState;
+
+
 
 public:
 	Sample5(HINSTANCE hInstance) :D3DApp(hInstance) {}
@@ -48,4 +63,12 @@ public:
 	void Render() override;
 	void UpdateScene(float deltaTime) override;
 	void RenderGBuffer();
+	float getRandData(int min, int max) {
+		float m1 = (float)(rand() % 101) / 101;
+		min++;
+		float m2 = (float)((rand() % (max - min + 1)) + min);
+		m2 = m2 - 1;
+		return m1 + m2;
+	}
+
 };

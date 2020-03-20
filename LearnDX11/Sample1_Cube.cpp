@@ -21,5 +21,7 @@ void Sample1::Render() {
 	XMMATRIX proj = camera->GetProjMatrix();
 	XMMATRIX mvp = view * proj;
 	shader->SetMatrix4x4("mvp",mvp);
+
 	boxMesh->Draw(shader,md3dImmediateContext.Get());
+
 }

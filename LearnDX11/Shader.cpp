@@ -62,7 +62,7 @@ void Shader::SetMatrix4x4(const std::string& paramName, const float4x4 &value) {
 	HR(effect->GetVariableByName(paramName.c_str())->AsMatrix()->SetMatrix(reinterpret_cast<float*>(&marix)));
 }
 void Shader::SetRawValue(const std::string& paramName, const void *pData, uint size) {
-	HR(effect->GetVariableByName(paramName.c_str())->SetRawValue(pData, 0, size));
+	HR(effect->GetVariableByName(paramName.c_str())->SetRawValue(pData, 0, size));	
 }
 void Shader::SetMatrix4x4(const std::string& paramName, XMMATRIX &value) {
 	HR(effect->GetVariableByName(paramName.c_str())->AsMatrix()->SetMatrix(reinterpret_cast<float*>(&value)));

@@ -17,6 +17,7 @@ struct PointLight {
 	float3 lightColor;
 	float Linear;	// 衰减一次项
 	float Quadratic;	// 衰减二次项
+    float3 empty;
 };
 
 // 聚光灯

@@ -4,6 +4,7 @@
 
 void Sample5::OnStart() {
 	camera = std::make_shared<SJM::Camera>(float3(0, 0, -3), float3(0, 0, 0), AspectRatio());
+	camera->Far = 100;
 
 	textureWidth = mClientWidth;
 	textureHeight = mClientHeight;
@@ -102,6 +103,74 @@ void Sample5::OnStart() {
 
 	textureMapShader = std::make_shared<Shader>(L"Shader/Common/Compiled/textureMap.fxo",md3dDevice.Get());
 	whiteObjectShader = std::make_shared<Shader>(L"Shader/Common/Compiled/WhiteObject.fxo", md3dDevice.Get());
+
+	pointLights.resize(100);
+	lightVloumes.resize(100);
+	// 初始化100个点光源,x = [-5,5],y = [0,6],z = [-5,5]
+	for (int i = 0; i < 100;i++) {
+		PointLight p;
+		p.pos = float3(
+			getRandData(-5,5),
+			getRandData(0,10),
+			getRandData(-5,5)
+			);
+		p.lightColor = float3(
+			getRandData(0,1),
+			getRandData(0, 1),
+			getRandData(0, 1)
+		);
+		p.Constant = 1.0;
+		p.Linear = 5.0f;
+		p.Quadratic = 0.01f;
+		
+		pointLights[i] = p;
+		
+		float lightMax = std::fmaxf(std::fmaxf(p.lightColor.x,p.lightColor.y),p.lightColor.z);
+		lightVloumes[i] =
+			(
+				-p.Linear +
+				std::sqrtf(p.Linear * p.Linear - 4 * p.Quadratic * (p.Constant - (256.0/5.0) * lightMax))
+			) / 
+			(2*p.Quadratic);
+	}
+
+	pointLights[0].pos = float3(2,5,0);
+	pointLights[0].lightColor = float3(1,0,0);
+	float lightMax = std::fmaxf(std::fmaxf(pointLights[0].lightColor.x, pointLights[0].lightColor.y), pointLights[0].lightColor.z);
+	lightVloumes[0] = (
+		-pointLights[0].Linear +
+		std::sqrtf(pointLights[0].Linear * pointLights[0].Linear - 4 * pointLights[0].Quadratic * (pointLights[0].Constant - (256.0 / 5.0) * lightMax))
+		) /
+		(2 * pointLights[0].Quadratic);
+
+
+	// 初始化光源的Mesh
+	sphereMesh = GeometryGenerator::CreateSphere(1,32,32);
+	sphereMesh->SetUpBuffer(md3dDevice.Get());
+
+	defferdShaderLightVloume = std::make_shared<Shader>(L"Shader/Sample4 Deffered/Compiled/defferedLightVloume.fxo",md3dDevice.Get());
+
+	D3D11_RENDER_TARGET_BLEND_DESC rtBlendDesc;
+	rtBlendDesc.BlendEnable = true;
+	rtBlendDesc.SrcBlend = D3D11_BLEND_ONE;
+	rtBlendDesc.DestBlend = D3D11_BLEND_ONE;
+	rtBlendDesc.BlendOp = D3D11_BLEND_OP_ADD;
+	rtBlendDesc.SrcBlendAlpha = D3D11_BLEND_ONE;
+	rtBlendDesc.DestBlendAlpha = D3D11_BLEND_ONE;
+	rtBlendDesc.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	rtBlendDesc.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	D3D11_BLEND_DESC blendDesc;
+	blendDesc.AlphaToCoverageEnable = false;
+	blendDesc.IndependentBlendEnable = false;
+	blendDesc.RenderTarget[0] = rtBlendDesc;
+	HR(md3dDevice->CreateBlendState(&blendDesc,blendState.GetAddressOf()));
+
+	colorObjectShader = std::make_shared<Shader>(L"Shader/Common/Compiled/ColorObject.fxo",md3dDevice.Get());
+	
+	CD3D11_DEPTH_STENCIL_DESC depthStencilState = CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT);
+	depthStencilState.DepthEnable = false;	
+	HR(md3dDevice->CreateDepthStencilState(&depthStencilState,depthState.GetAddressOf()));
 }
 
 void Sample5::UpdateScene(float deltaTime) {
@@ -117,39 +186,58 @@ void Sample5::Render() {
 	// 重置渲染目标/视口,并对颜色和深度缓冲区进行清除
 	md3dImmediateContext->OMSetRenderTargets(1,mRenderTargetView.GetAddressOf(),mDepthStencilView.Get());
 	md3dImmediateContext->RSSetViewports(1,&mScreenViewport);
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView.Get(), reinterpret_cast<const float*>(&Colors::Silver));
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView.Get(), reinterpret_cast<const float*>(&Colors::Black));
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0, 0);
 	auto view = camera->GetViewMatrix(); auto proj = camera->GetProjMatrix();
 
-	//auto model = XMMatrixScaling(1, 1, 1) * XMMatrixTranslation(0,3,0);
-	//auto mvp = model * view * proj;
-	//whiteObjectShader->SetMatrix4x4("mvp", mvp);
-	//boxMesh->Draw(whiteObjectShader, md3dImmediateContext.Get());
-
-	//std::vector<float3> quadPositions = {
-	//	{-5,3,0},
-	//	{-10,3,0},
-	//	{-15,3,0}
-	//};
-	//for (uint i = 0; i < quadPositions.size(); i++) {
-	//	// 显示GBuffer进行测试
-	//	auto quadModel = XMMatrixScaling(3,3,3) * XMMatrixTranslation(quadPositions[i].x, quadPositions[i].y, quadPositions[i].z);
-	//	auto mvp = quadModel * view * proj;
-	//	textureMapShader->SetMatrix4x4("mvp", mvp);
-	//	textureMapShader->SetShaderResource("mainTex", gBufferSRVs[i].Get());
-	//	quadMesh->Draw(textureMapShader,md3dImmediateContext.Get());
-	//}
-
-
 	// 根据GBuffer对平铺四边形进行着色
 	defferedShader->SetFloat3("viewPos",camera->pos);
-	defferedShader->SetRawValue("pointLight",&pointLight,sizeof(PointLight));
+	defferedShader->SetRawValue("pointLight",&pointLights[0],sizeof(PointLight)*100);
 	defferedShader->SetShaderResource("gWorldPosTex",gBufferSRVs[0].Get());
 	defferedShader->SetShaderResource("gWorldNormalTex", gBufferSRVs[1].Get());
 	defferedShader->SetShaderResource("gAlbedoGloss", gBufferSRVs[2].Get());
 	quadMesh->Draw(defferedShader,md3dImmediateContext.Get());
+	
 
-	md3dImmediateContext->PSSetShaderResources(0,3,null);
+	md3dImmediateContext->OMSetDepthStencilState(depthState.Get(),0xff);
+	// 可视化光源的范围
+	//for (uint i = 0; i < 1; i++) {
+	//	auto lightModel = XMMatrixScaling(lightVloumes[i], lightVloumes[i], lightVloumes[i]) * XMMatrixTranslation(pointLights[i].pos.x, pointLights[i].pos.y, pointLights[i].pos.z);
+	//	auto mvp = lightModel * view * proj;
+	//	whiteObjectShader->SetMatrix4x4("mvp", mvp);
+	//	sphereMesh->Draw(whiteObjectShader, md3dImmediateContext.Get(), D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+	//}
+
+	// 渲染光源
+	// 重置深度缓冲区为GBuffer渲染后的深度缓冲区
+	md3dImmediateContext->OMSetRenderTargets(1,mRenderTargetView.GetAddressOf(),mDepthStencilView.Get());	
+	float blendFactor[4] = {1,1,1,1};
+	md3dImmediateContext->OMSetBlendState(blendState.Get(),blendFactor, 0xffffffff);
+	defferdShaderLightVloume->SetFloat3("viewPos", camera->pos);
+	defferdShaderLightVloume->SetShaderResource("gWorldPosTex",gBufferSRVs[0].Get());
+	defferdShaderLightVloume->SetShaderResource("gWorldNormalTex", gBufferSRVs[1].Get());
+	defferdShaderLightVloume->SetShaderResource("gAlbedoGloss", gBufferSRVs[2].Get());
+	for (uint i = 0; i < 100;i++) {
+		auto lightModel = XMMatrixScaling(lightVloumes[i], lightVloumes[i], lightVloumes[i]) * XMMatrixTranslation(pointLights[i].pos.x, pointLights[i].pos.y, pointLights[i].pos.z);
+		auto mvp = lightModel * view * proj;
+		defferdShaderLightVloume->SetMatrix4x4("mvp",mvp);
+		defferdShaderLightVloume->SetRawValue("pointLight",&pointLights[i],sizeof(PointLight));
+		sphereMesh->Draw(defferdShaderLightVloume,md3dImmediateContext.Get());
+
+	}
+	md3dImmediateContext->PSSetShaderResources(0, 3, null);
+
+
+	// 重置Blend和深度测试指令
+	md3dImmediateContext->OMSetBlendState(NULL,NULL, 0xffffffff);
+	md3dImmediateContext->OMSetDepthStencilState(NULL,0);
+
+	//auto mvp = XMMatrixScaling(1,1,1) * view * proj;
+	//colorObjectShader->SetMatrix4x4("mvp",mvp);
+	//colorObjectShader->SetFloat4("color",float4(1,0,0,1));
+	//boxMesh->Draw(colorObjectShader,md3dImmediateContext.Get());
+	//colorObjectShader->SetFloat4("color",float4(0,1,0,1));
+	//boxMesh->Draw(colorObjectShader, md3dImmediateContext.Get());
 }
 
 void Sample5::RenderGBuffer() {

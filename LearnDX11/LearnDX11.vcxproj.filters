@@ -202,5 +202,11 @@
     <FxCompile Include="Shader\Sample4 Deffered\defferedWithoutLightVloume.fx">
       <Filter>Shader\Sample4 Deffered</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Sample4 Deffered\defferedLightVloume.fx">
+      <Filter>Shader\Sample4 Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Common\ColorObject.fx">
+      <Filter>Shader\Common</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
