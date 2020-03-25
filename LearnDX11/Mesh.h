@@ -8,10 +8,11 @@ private:
 	ComPtr<ID3D11Buffer> verticesBuffer;
 	ComPtr<ID3D11Buffer> indicesBuffer;
 	uint indexCount;
-
+	 
+public:
 	std::vector<DefaultVertex> vertics;
 	std::vector<uint> indices;
-public:
+
 	Mesh(const std::vector<DefaultVertex>& vertices, const std::vector<uint>& indices) :vertics(vertices), indices(indices) { indexCount = indices.size(); }
 	Mesh(const std::vector<DefaultVertex>& vertics, const std::vector<uint>& indices, ID3D11Device* device);
 	virtual ~Mesh();

@@ -111,6 +111,12 @@
     <ClCompile Include="Sample5_Deffered.cpp">
       <Filter>源文件\Sample</Filter>
     </ClCompile>
+    <ClCompile Include="xnacollision.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample6_QuadTree.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -169,6 +175,12 @@
     </ClInclude>
     <ClInclude Include="Sample5_Deffered.h">
       <Filter>头文件\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample6_QuadTree.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="xnacollision.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
