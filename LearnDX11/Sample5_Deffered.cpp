@@ -3,8 +3,8 @@
 #include "GeometryGenerator.h"
 
 void Sample5::OnStart() {
-	camera = std::make_shared<SJM::Camera>(float3(0, 0, -3), float3(0, 0, 0), AspectRatio());
-	camera->Far = 100;
+	camera = std::make_shared<SJM::Camera>(float3(0, 3,-100), float3(0, 0, 0), AspectRatio());
+	camera->Far = 1000;
 
 	textureWidth = mClientWidth;
 	textureHeight = mClientHeight;
@@ -135,6 +135,8 @@ void Sample5::OnStart() {
 	}
 
 	pointLights[0].pos = float3(2,5,0);
+	pointLights[0].Linear = 0.09f;
+	pointLights[0].Quadratic = 0.032f;
 	pointLights[0].lightColor = float3(1,0,0);
 	float lightMax = std::fmaxf(std::fmaxf(pointLights[0].lightColor.x, pointLights[0].lightColor.y), pointLights[0].lightColor.z);
 	lightVloumes[0] = (
@@ -143,6 +145,8 @@ void Sample5::OnStart() {
 		) /
 		(2 * pointLights[0].Quadratic);
 	pointLights[1].pos = float3(-2, 5, 0);
+	pointLights[1].Linear = 0.09f;
+	pointLights[1].Quadratic = 0.032f;
 	pointLights[1].lightColor = float3(0, 1, 0);
 	lightMax = std::fmaxf(std::fmaxf(pointLights[1].lightColor.x, pointLights[1].lightColor.y), pointLights[1].lightColor.z);
 	lightVloumes[1] = (
@@ -178,68 +182,194 @@ void Sample5::OnStart() {
 	
 	CD3D11_DEPTH_STENCIL_DESC depthStencilState = CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT);
 	depthStencilState.DepthEnable = false;	
+	
 	HR(md3dDevice->CreateDepthStencilState(&depthStencilState,depthState.GetAddressOf()));
+
+
+	// 初始化用于延迟渲染的两个Stencil State
+	// 用于延迟渲染,渲染光球体阶段前面一个阶段的,Stencil Pass的模板状态
+	// 状态为：
+	//		1. 禁用深度写入
+	//		2. 在渲染正面的三角面片时,如果深度测试失败,那么模板缓冲区对应像素位置-1
+	//		3. 在渲染背面的三角面片时,如果深度测试失败,那么模板缓冲区对应的像素位置+1
+	//		4. 正常渲染光球体,将模板状态改为只有模板缓冲区值不为0时,才对该像素进行渲染
+
+	D3D11_DEPTH_STENCILOP_DESC depthOPDesc;
+	depthOPDesc.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthOPDesc.StencilFailOp = D3D11_STENCIL_OP_INCR;
+	depthOPDesc.StencilPassOp = D3D11_STENCIL_OP_INCR;
+	depthOPDesc.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+
+	CD3D11_DEPTH_STENCIL_DESC stencilPassStateDesc = CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT);
+	// 背面渲染 : 深度测试失败时,模板值+1
+	stencilPassStateDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	// 正面渲染 : 深度测试失败时,模板值-1
+	stencilPassStateDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;		
+	// 禁用深度写入
+	stencilPassStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	// 开启深度测试
+	stencilPassStateDesc.DepthEnable = true;
+	// 开启模板测试
+	stencilPassStateDesc.StencilEnable = true;
+	
+
+	HR(md3dDevice->CreateDepthStencilState(&stencilPassStateDesc,stencilPassState.GetAddressOf()));
+	
+	// 初始化用于渲染光球体的Stencil State
+	// 1. 开启正面剔除,仅渲染背面
+	// 2. 当目标像素模板值不为0时才进行渲染
+	// 3. 禁用深度测试
+	CD3D11_DEPTH_STENCIL_DESC lightPassStencilStateDesc = CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT);
+	// 开启模板测试
+	lightPassStencilStateDesc.StencilEnable = true;
+	// 设置背面的模板函数,当模板值不等于0时,模板测试失败
+	lightPassStencilStateDesc.BackFace.StencilFunc = D3D11_COMPARISON_NOT_EQUAL;
+	// 禁用深度测试
+	lightPassStencilStateDesc.DepthEnable = false;
+	HR(md3dDevice->CreateDepthStencilState(&lightPassStencilStateDesc,lightPassStencilState.GetAddressOf()));
+	
+
+	// 禁用面剔除
+	CD3D11_RASTERIZER_DESC cullFaceStateDesc = CD3D11_RASTERIZER_DESC(D3D11_DEFAULT);
+	cullFaceStateDesc.CullMode = D3D11_CULL_NONE;
+	HR(md3dDevice->CreateRasterizerState(&cullFaceStateDesc,noCullFaceState.GetAddressOf()));
+	
+	// 禁用正面剔除
+	cullFaceStateDesc.CullMode = D3D11_CULL_FRONT;	
+	HR(md3dDevice->CreateRasterizerState(&cullFaceStateDesc,cullFrontFaceState.GetAddressOf()));
+	
 }
 
 void Sample5::UpdateScene(float deltaTime) {
 
 }
 
-void Sample5::Render() {
-	// 渲染GBuffer
-	RenderGBuffer();
-
-	ID3D11ShaderResourceView* null[] = {nullptr,nullptr,nullptr};
-
-	// 重置渲染目标/视口,并对颜色和深度缓冲区进行清除
-	md3dImmediateContext->OMSetRenderTargets(1,mRenderTargetView.GetAddressOf(),mDepthStencilView.Get());
-	md3dImmediateContext->RSSetViewports(1,&mScreenViewport);
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView.Get(), reinterpret_cast<const float*>(&Colors::Black));
-	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0, 0);
+void Sample5::CalculateStencilPass() {
 	auto view = camera->GetViewMatrix(); auto proj = camera->GetProjMatrix();
 
-	// 根据GBuffer对平铺四边形进行着色
-	//defferedShader->SetFloat3("viewPos",camera->pos);
-	//defferedShader->SetRawValue("pointLight",&pointLights[0],sizeof(PointLight)*100);
-	//defferedShader->SetShaderResource("gWorldPosTex",gBufferSRVs[0].Get());
-	//defferedShader->SetShaderResource("gWorldNormalTex", gBufferSRVs[1].Get());
-	//defferedShader->SetShaderResource("gAlbedoGloss", gBufferSRVs[2].Get());
-	//quadMesh->Draw(defferedShader,md3dImmediateContext.Get());
-	
+	// 重置渲染目标/视口,并清除颜色和模板缓冲区
+	md3dImmediateContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), depthTexDSV.Get());
+	md3dImmediateContext->RSSetViewports(1, &mScreenViewport);
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView.Get(), reinterpret_cast<const float*>(&Colors::Black));
+	// 仅清除模板缓冲区,这里要用到GBuffer的深度缓冲区
+	md3dImmediateContext->ClearDepthStencilView(depthTexDSV.Get(), D3D11_CLEAR_STENCIL, 1.0, 0);
 
+	// 开启深度测试和模板测试,禁用深度写入
+	md3dImmediateContext->OMSetDepthStencilState(stencilPassState.Get(),0);
+	// 禁用面剔除
+	md3dImmediateContext->RSSetState(noCullFaceState.Get());
 
-	// 渲染光源
-	// 取消深度测试
-	md3dImmediateContext->OMSetDepthStencilState(depthState.Get(), 0xff);
-	// 重置深度缓冲区为GBuffer渲染后的深度缓冲区
-	md3dImmediateContext->OMSetRenderTargets(1,mRenderTargetView.GetAddressOf(),mDepthStencilView.Get());	
-	float blendFactor[4] = {1,1,1,1};
-	md3dImmediateContext->OMSetBlendState(blendState.Get(),blendFactor, 0xffffffff);
+	for (uint i = 0; i < currentLightCount; i++) {
+		auto lightModel = XMMatrixScaling(lightVloumes[i], lightVloumes[i], lightVloumes[i]) * XMMatrixTranslation(pointLights[i].pos.x, pointLights[i].pos.y, pointLights[i].pos.z);
+		auto mvp = lightModel * view * proj;
+		whiteObjectShader->SetMatrix4x4("mvp", mvp);
+		sphereMesh->Draw(whiteObjectShader, md3dImmediateContext.Get());
+	}
+
+	// 重置DepthStencilState
+	md3dImmediateContext->OMSetDepthStencilState(NULL,0);
+	md3dImmediateContext->RSSetState(NULL);
+}
+
+void Sample5::LightPass() {
+	md3dImmediateContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), depthTexDSV.Get());
+	md3dImmediateContext->RSSetViewports(1, &mScreenViewport);
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView.Get(), reinterpret_cast<const float*>(&Colors::Black));
+
+	auto view = camera->GetViewMatrix(); auto proj = camera->GetProjMatrix();
+
+	// 开启模板测试,仅当目标像素模板值不为0时测试通过,禁用深度测试
+	md3dImmediateContext->OMSetDepthStencilState(lightPassStencilState.Get(),0);
+	// 开启正面剔除
+	md3dImmediateContext->RSSetState(cullFrontFaceState.Get());
+	// 开启混合
+	md3dImmediateContext->OMSetBlendState(blendState.Get(), NULL, 0xffffffff);
+
 	defferdShaderLightVloume->SetFloat3("viewPos", camera->pos);
 	defferdShaderLightVloume->SetShaderResource("gWorldPosTex",gBufferSRVs[0].Get());
 	defferdShaderLightVloume->SetShaderResource("gWorldNormalTex", gBufferSRVs[1].Get());
 	defferdShaderLightVloume->SetShaderResource("gAlbedoGloss", gBufferSRVs[2].Get());
-	for (uint i = 0; i < 100;i++) {
+	for (uint i = 0; i < currentLightCount; i++) {
 		auto lightModel = XMMatrixScaling(lightVloumes[i], lightVloumes[i], lightVloumes[i]) * XMMatrixTranslation(pointLights[i].pos.x, pointLights[i].pos.y, pointLights[i].pos.z);
 		auto mvp = lightModel * view * proj;
 		defferdShaderLightVloume->SetMatrix4x4("mvp",mvp);
 		defferdShaderLightVloume->SetRawValue("pointLight",&pointLights[i],sizeof(PointLight));
-		sphereMesh->Draw(defferdShaderLightVloume,md3dImmediateContext.Get());
-
+		sphereMesh->Draw(defferdShaderLightVloume, md3dImmediateContext.Get());
 	}
+
+	// 重置各个渲染状态
+	md3dImmediateContext->OMSetDepthStencilState(NULL,0);
+	md3dImmediateContext->RSSetState(NULL);
+	md3dImmediateContext->OMSetBlendState(NULL,NULL, 0xffffffff);
+
+}
+
+void Sample5::Render() {
+	ID3D11ShaderResourceView* null[] = { nullptr,nullptr,nullptr };
+
 	md3dImmediateContext->PSSetShaderResources(0, 3, null);
 
+	// 渲染GBuffer
+	RenderGBuffer();
 
-	// 重置Blend和深度测试指令
-	md3dImmediateContext->OMSetBlendState(NULL,NULL, 0xffffffff);
-	md3dImmediateContext->OMSetDepthStencilState(NULL,0);
+	// 渲染光球体的模板缓冲区
+	CalculateStencilPass();
 
-	//auto mvp = XMMatrixScaling(1,1,1) * view * proj;
-	//colorObjectShader->SetMatrix4x4("mvp",mvp);
-	//colorObjectShader->SetFloat4("color",float4(1,0,0,1));
-	//boxMesh->Draw(colorObjectShader,md3dImmediateContext.Get());
-	//colorObjectShader->SetFloat4("color",float4(0,1,0,1));
-	//boxMesh->Draw(colorObjectShader, md3dImmediateContext.Get());
+	// 渲染光球体
+	LightPass();
+
+
+
+	//// 重置渲染目标/视口,并对颜色和深度缓冲区进行清除
+	//md3dImmediateContext->OMSetRenderTargets(1,mRenderTargetView.GetAddressOf(),mDepthStencilView.Get());
+	//md3dImmediateContext->RSSetViewports(1,&mScreenViewport);
+	//md3dImmediateContext->ClearRenderTargetView(mRenderTargetView.Get(), reinterpret_cast<const float*>(&Colors::Black));
+	//md3dImmediateContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0, 0);
+	//auto view = camera->GetViewMatrix(); auto proj = camera->GetProjMatrix();
+
+	//// 根据GBuffer对平铺四边形进行着色
+	////defferedShader->SetFloat3("viewPos",camera->pos);
+	////defferedShader->SetRawValue("pointLight",&pointLights[0],sizeof(PointLight)*100);
+	////defferedShader->SetShaderResource("gWorldPosTex",gBufferSRVs[0].Get());
+	////defferedShader->SetShaderResource("gWorldNormalTex", gBufferSRVs[1].Get());
+	////defferedShader->SetShaderResource("gAlbedoGloss", gBufferSRVs[2].Get());
+	////quadMesh->Draw(defferedShader,md3dImmediateContext.Get());
+	//
+
+
+	//// 渲染光源
+	//// 取消深度测试
+	//md3dImmediateContext->OMSetDepthStencilState(depthState.Get(), 0xff);
+	//// 重置深度缓冲区为GBuffer渲染后的深度缓冲区
+	//md3dImmediateContext->OMSetRenderTargets(1,mRenderTargetView.GetAddressOf(),mDepthStencilView.Get());	
+	//float blendFactor[4] = {1,1,1,1};
+	//md3dImmediateContext->OMSetBlendState(blendState.Get(),blendFactor, 0xffffffff);
+	//defferdShaderLightVloume->SetFloat3("viewPos", camera->pos);
+	//defferdShaderLightVloume->SetShaderResource("gWorldPosTex",gBufferSRVs[0].Get());
+	//defferdShaderLightVloume->SetShaderResource("gWorldNormalTex", gBufferSRVs[1].Get());
+	//defferdShaderLightVloume->SetShaderResource("gAlbedoGloss", gBufferSRVs[2].Get());
+	//for (uint i = 0; i < currentLightCount;i++) {
+	//	auto lightModel = XMMatrixScaling(lightVloumes[i], lightVloumes[i], lightVloumes[i]) * XMMatrixTranslation(pointLights[i].pos.x, pointLights[i].pos.y, pointLights[i].pos.z);
+	//	auto mvp = lightModel * view * proj;
+	//	defferdShaderLightVloume->SetMatrix4x4("mvp",mvp);
+	//	defferdShaderLightVloume->SetRawValue("pointLight",&pointLights[i],sizeof(PointLight));
+	//	sphereMesh->Draw(defferdShaderLightVloume,md3dImmediateContext.Get());
+
+	//}
+	//md3dImmediateContext->PSSetShaderResources(0, 3, null);
+
+
+	//// 重置Blend和深度测试指令
+	//md3dImmediateContext->OMSetBlendState(NULL,NULL, 0xffffffff);
+	//md3dImmediateContext->OMSetDepthStencilState(NULL,0);
+
+	////auto mvp = XMMatrixScaling(1,1,1) * view * proj;
+	////colorObjectShader->SetMatrix4x4("mvp",mvp);
+	////colorObjectShader->SetFloat4("color",float4(1,0,0,1));
+	////boxMesh->Draw(colorObjectShader,md3dImmediateContext.Get());
+	////colorObjectShader->SetFloat4("color",float4(0,1,0,1));
+	////boxMesh->Draw(colorObjectShader, md3dImmediateContext.Get());
 }
 
 void Sample5::RenderGBuffer() {
@@ -251,7 +381,7 @@ void Sample5::RenderGBuffer() {
 	for (uint i = 0; i < bufferCount; i++) {
 		md3dImmediateContext->ClearRenderTargetView(gBufferRTVs[i].Get(), reinterpret_cast<const float*>(&Colors::Black));
 	}
-	md3dImmediateContext->ClearDepthStencilView(depthTexDSV.Get(), D3D11_CLEAR_DEPTH, 1.0, 0);
+	md3dImmediateContext->ClearDepthStencilView(depthTexDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0, 0);
 
 	auto view = camera->GetViewMatrix();
 	auto proj = camera->GetProjMatrix();

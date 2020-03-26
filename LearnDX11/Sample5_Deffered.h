@@ -55,14 +55,36 @@ private:
 
 	ComPtr<ID3D11DepthStencilState> depthState;
 
+	// 用于延迟渲染,渲染光球体阶段前面一个阶段的,Stencil Pass的模板状态
+	// 状态为：
+	//		1. 禁用深度写入
+	//		2. 在渲染正面的三角面片时,如果深度测试失败,那么模板缓冲区对应像素位置-1
+	//		3. 在渲染背面的三角面片时,如果深度测试失败,那么模板缓冲区对应的像素位置+1
+	//		4. 正常渲染光球体,将模板状态改为只有模板缓冲区值不为0时,才对该像素进行渲染
 
+	ComPtr<ID3D11DepthStencilState> stencilPassState;
 
+	// 绘制Light Vloume时的Stencil State,状态为:
+	// 1. 开启正面剔除,仅渲染背面
+	// 2. 当目标像素模板值不为1时才进行渲染
+	// 3. 禁用深度测试
+	ComPtr<ID3D11DepthStencilState> lightPassStencilState;
+
+	// 禁用面剔除的光栅化状态
+	ComPtr<ID3D11RasterizerState> noCullFaceState;
+	// 开启正面剔除的光栅化状态
+	ComPtr<ID3D11RasterizerState> cullFrontFaceState;
+
+	// 当前渲染的光源数目
+	uint currentLightCount = 100;
 public:
 	Sample5(HINSTANCE hInstance) :D3DApp(hInstance) {}
 	void OnStart() override;
 	void Render() override;
 	void UpdateScene(float deltaTime) override;
 	void RenderGBuffer();
+	void CalculateStencilPass();
+	void LightPass();
 	float getRandData(int min, int max) {
 		float m1 = (float)(rand() % 101) / 101;
 		min++;

@@ -14,7 +14,7 @@
 int main()
 {
 	HINSTANCE hInstance = GetModuleHandle(0);
-	Sample6 sample(hInstance);
+	Sample5 sample(hInstance);
 	if (!sample.Init()) {
 		std::cout << "应用程序初始化错误!!!" << std::endl;
 	}
