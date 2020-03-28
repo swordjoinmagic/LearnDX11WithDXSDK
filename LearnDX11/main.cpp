@@ -10,11 +10,12 @@
 #include "Sample4_PointShadow.h"
 #include "Sample5_Deffered.h"
 #include "Sample6_QuadTree.h"
+#include "Sample7_CSM.h"
 
 int main()
 {
 	HINSTANCE hInstance = GetModuleHandle(0);
-	Sample5 sample(hInstance);
+	Sample7 sample(hInstance);
 	if (!sample.Init()) {
 		std::cout << "应用程序初始化错误!!!" << std::endl;
 	}

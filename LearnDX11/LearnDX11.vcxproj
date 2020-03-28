@@ -198,7 +198,9 @@
     <ClCompile Include="Sample4_PointShadow.cpp" />
     <ClCompile Include="Sample5_Deffered.cpp" />
     <ClCompile Include="Sample6_QuadTree.cpp" />
+    <ClCompile Include="Sample7_CSM.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SpriteRender.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="xnacollision.cpp" />
   </ItemGroup>
@@ -221,7 +223,9 @@
     <ClInclude Include="Sample4_PointShadow.h" />
     <ClInclude Include="Sample5_Deffered.h" />
     <ClInclude Include="Sample6_QuadTree.h" />
+    <ClInclude Include="Sample7_CSM.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SpriteRender.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="xnacollision.h" />
   </ItemGroup>
@@ -260,6 +264,8 @@
     <FxCompile Include="Shader\Sample4 Deffered\defferedLightVloume.fx" />
     <FxCompile Include="Shader\Sample4 Deffered\defferedWithoutLightVloume.fx" />
     <FxCompile Include="Shader\Sample4 Deffered\renderGBuffer.fx" />
+    <FxCompile Include="Shader\Sample5 CSM\renderShadowMap.fx" />
+    <FxCompile Include="Shader\Sample5 CSM\shadow.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,10 +4,13 @@
 struct Light{
 	// 理论上来说，平行光不具备位置属性
 	// 这里为了渲染阴影贴图（获得光源的VP矩阵）临时设置一个
-	float3 pos;    
+	float3 pos;
+    float empty1;
 	// 平行光方向
 	float3 dir;	
+    float empty2;
 	float3 lightColor;
+    float empty3;
 };
 
 // 点光源
@@ -33,6 +36,49 @@ struct SpotLight {
 	// 聚光灯内角的余弦值
 	float cutOff;
 };
+
+/* 给定以下参数,获得平行光兰伯特光照模型结果
+    1. 一个平行光光源
+    2. 法线方向
+    3. 当前片元世界空间位置
+*/
+float3 ProcessLightDiffuseWithLambert(
+    Light light,
+    float3 worldNormal,
+    float3 worldPos
+){
+    // 世界法线
+    float3 N = normalize(worldNormal);
+    // 光源的入射方向,注意这里是从片元指向光源位置
+    float3 L = normalize(light.dir);
+
+    float NDotL = dot(N,L) * 0.5 + 0.5;
+
+    return light.lightColor * NDotL;
+}
+
+float3 ProcessLightSpecWithLambert(
+    Light light,
+    float3 worldNormal,
+    float3 worldPos,
+    float3 viewPos,
+    float gloss
+){
+    // 世界空间的法线方向
+    float3 N = normalize(worldNormal);
+    // 世界空间的观察方向,注意是从物体指向观察者(摄像机)
+    float3 V = normalize(viewPos - worldPos);
+    // 世界空间的光源方向,从物体指向光源
+    float3 L = normalize(light.dir);
+    
+    // 计算half向量(worldViewDir和worldLightDir中间向量)
+    float3 halfDir = normalize(V+L);
+
+    // half向量和法线的夹角余弦值与高光反射分量成正比
+    float spec = pow(max(0,dot(halfDir,N)),gloss);
+
+    return light.lightColor * spec;
+}
 
 // 给定一个点光源,法线方向,当前片元位置(世界空间),给出使用半兰伯特模型处理的漫反射光照结果
 float ProcessPointLightDiffuseWithLambert(PointLight pointLight,float3 worldNormal,float3 worldPos){

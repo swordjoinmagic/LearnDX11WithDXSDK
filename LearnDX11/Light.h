@@ -9,9 +9,12 @@ struct Light {
 	// 理论上来说，平行光不具备位置属性
 	// 这里为了渲染阴影贴图（获得光源的VP矩阵）临时设置一个
 	float3 pos;
-	// 平行光方向,
+	float empty1;
+	// 平行光方向
 	float3 dir;
+	float empty2;
 	float3 lightColor;
+	float empty3;
 };
 
 // 点光源
