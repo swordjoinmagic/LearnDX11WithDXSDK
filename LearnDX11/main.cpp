@@ -11,6 +11,7 @@
 #include "Sample5_Deffered.h"
 #include "Sample6_QuadTree.h"
 #include "Sample7_CSM.h"
+#include "Sample8_ShadowTest.h"
 
 int main()
 {

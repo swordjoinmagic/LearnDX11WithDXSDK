@@ -5,19 +5,19 @@
 void Sample7::OnStart() {
 	// 初始化摄像机
 	camera = std::make_shared<SJM::Camera>(float3(0, 3, -5), float3(0, 0, 0), AspectRatio());
-	//camera->Near = 1;
+	camera->Near = 1;
 
 	// 初始化平行光
 	light.pos = float3(0,0,0);
 	light.dir = float3(1,1,0);
 	light.lightColor = float3(1,1,1);
 
-	light.pos = float3(2,4,0);
+	//light.pos = float3(2,4,0);
 #pragma region 初始化深度贴图
 	// 初始化深度贴图
 	D3D11_TEXTURE2D_DESC shadowMapDesc;
-	shadowMapDesc.Width = mClientWidth;
-	shadowMapDesc.Height = mClientHeight;
+	shadowMapDesc.Width = textureSize;
+	shadowMapDesc.Height = textureSize;
 	shadowMapDesc.MipLevels = 1;
 	shadowMapDesc.ArraySize = 1;
 	shadowMapDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
@@ -66,6 +66,19 @@ void Sample7::OnStart() {
 
 	// 初始化渲染深度图的Shader
 	renderShadowMapShader = std::make_shared<Shader>(L"Shader/Sample5 CSM/Compiled/renderShadowMap.fxo",md3dDevice.Get());
+
+
+	CD3D11_RASTERIZER_DESC cullFrontFaceStateDesc = CD3D11_RASTERIZER_DESC(D3D11_DEFAULT);
+	cullFrontFaceStateDesc.CullMode = D3D11_CULL_FRONT;
+	HR(md3dDevice->CreateRasterizerState(&cullFrontFaceStateDesc,cullFrontFaceState.GetAddressOf()));
+
+	renderShadowMapViewPort.TopLeftX = 0;
+	renderShadowMapViewPort.TopLeftY = 0;
+	renderShadowMapViewPort.Width = static_cast<float>(textureSize);
+	renderShadowMapViewPort.Height = static_cast<float>(textureSize);
+	renderShadowMapViewPort.MinDepth = 0.0f;
+	renderShadowMapViewPort.MaxDepth = 1.0f;
+
 
 }
 
@@ -144,6 +157,46 @@ void Sample7::CalculateCameraCorners() {
 		maxPoint.z = max(maxPoint.z, viewPos.z);
 	}
 
+#pragma region 取余算法阴影抖动问题
+	
+	// 约束光源以Texel为增量进行移动
+	XMVECTOR minValue = XMLoadFloat3(&minPoint);
+	XMVECTOR maxValue = XMLoadFloat3(&maxPoint);
+	XMVECTOR vFrustumPoints0 = XMLoadFloat4(&cameraConrners[0]);
+	XMVECTOR vFrustumPoints6 = XMLoadFloat4(&cameraConrners[7]);
+
+	float minZ = XMVectorGetZ(minValue);
+	float maxZ = XMVectorGetZ(maxValue);
+
+	XMVECTOR vDiagonal = XMVector3Length(vFrustumPoints0 - vFrustumPoints6);
+
+	float fCascadeBoung = XMVectorGetX(vDiagonal);
+
+	XMVECTOR vBorderOffset = (vDiagonal - (maxValue - minValue)) * XMVectorSet(0.5,0.5,0.5,0.5);
+	vBorderOffset *= XMVectorSet(1,1,0,0);
+
+	maxValue += vBorderOffset;
+	minValue -= vBorderOffset;
+
+	// 计算阴影贴图的每个纹素
+	XMVECTOR fWorldUnitPerTexel = XMVectorSet(fCascadeBoung / textureSize, fCascadeBoung  / textureSize, 1, 1);
+
+	// 让包围盒的minValue和maxValue为纹素的倍数
+	minValue /= fWorldUnitPerTexel;
+	minValue = XMVectorFloor(minValue);
+	minValue *= fWorldUnitPerTexel;
+
+	maxValue /= fWorldUnitPerTexel;
+	maxValue = XMVectorFloor(maxValue);
+	maxValue *= fWorldUnitPerTexel;
+
+	XMStoreFloat3(&minPoint,minValue);
+	minPoint.z = minZ;
+	XMStoreFloat3(&maxPoint,maxValue);
+	maxPoint.z = maxZ;
+
+#pragma endregion
+
 	// 获得光源摄像机正交投影的各个参数
 	// (或者说获得主摄像机在光源方向的包围盒信息)
 	shadowOrthProjInfo.right = maxPoint.x;
@@ -190,10 +243,14 @@ void Sample7::CalculateCameraCorners() {
 
 	// 获得光源摄像机在世界空间的坐标
 	XMStoreFloat3(&lcPos,lightCameraPos);
+
+
+
+	
 }
 
 void Sample7::UpdateScene(float deltaTime) {
-
+	
 }
 
 void Sample7::Render() {
@@ -210,8 +267,8 @@ void Sample7::Render() {
 	spriteRender->DrawSprite(
 		md3dImmediateContext.Get(),
 		shadowMapSRV.Get(),
-		float3(-400,-300,0),
-		float2(200,200));
+		float3(-mClientWidth/2,-mClientHeight/2,0),
+		float2(300*AspectRatio(),300));
 }
 
 void Sample7::RenderScene() {
@@ -230,25 +287,12 @@ void Sample7::RenderScene() {
 	auto upDir = XMVectorSet(0, 1, 0, 0);
 
 	auto lightView = XMMatrixLookAtLH(eyePos, focusPos, upDir);
-	//auto proj = XMMatrixOrthographicLH(10,10,0.1,50);
-	//auto proj = XMMatrixOrthographicOffCenterLH(
-	//	shadowOrthProjInfo.left,
-	//	shadowOrthProjInfo.right,
-	//	shadowOrthProjInfo.bottom,
-	//	shadowOrthProjInfo.top,
-	//	shadowOrthProjInfo.Near,
-	//	shadowOrthProjInfo.Far);
-	float maxLength = max(
+	auto lightProj = XMMatrixOrthographicLH(
 		shadowOrthProjInfo.right - shadowOrthProjInfo.left,
-		shadowOrthProjInfo.top - shadowOrthProjInfo.bottom
+		shadowOrthProjInfo.top - shadowOrthProjInfo.bottom,
+		0,
+		shadowOrthProjInfo.Far - shadowOrthProjInfo.Near
 	);
-	auto lightProj = XMMatrixOrthographicLH(maxLength, maxLength, 0, shadowOrthProjInfo.Far - shadowOrthProjInfo.Near);
-	//auto lightProj = XMMatrixOrthographicLH(
-	//	shadowOrthProjInfo.right - shadowOrthProjInfo.left,
-	//	shadowOrthProjInfo.top - shadowOrthProjInfo.bottom,
-	//	0,
-	//	shadowOrthProjInfo.Far - shadowOrthProjInfo.Near
-	//);
 
 	auto lightVPMatrix = lightView * lightProj;
 #pragma endregion
@@ -260,7 +304,7 @@ void Sample7::RenderScene() {
 	boxShader->SetFloat3("viewPos", camera->pos);
 	boxShader->SetShaderResource("shadowMap", shadowMapSRV.Get());
 	boxShader->SetMatrix4x4("lightVPMatrix",lightVPMatrix);
-	auto model = XMMatrixTranslation(0,3,0);
+	auto model = XMMatrixScaling(2, 2, 2) * XMMatrixTranslation(0,3,0);
 	auto transInvModel = XMMatrixTranspose(GetInverseMatrix(model));
 	auto mvp = model * view * proj;
 	boxShader->SetMatrix4x4("mvp",mvp);
@@ -284,10 +328,6 @@ void Sample7::RenderShadowMap() {
 	// 计算光源摄像机的位置
 	CalculateCameraCorners();
 	light.pos = lcPos;
-	float width = shadowOrthProjInfo.right - shadowOrthProjInfo.left;
-	float height = shadowOrthProjInfo.top - shadowOrthProjInfo.bottom;
-	float shadowNear = shadowOrthProjInfo.Near;
-	float shadowFar = shadowOrthProjInfo.Far;
 
 
 	ID3D11RenderTargetView* none[] = { nullptr };
@@ -295,34 +335,25 @@ void Sample7::RenderShadowMap() {
 	md3dImmediateContext->OMSetRenderTargets(1,none,shadowMapDSV.Get());
 	// 清除深度缓冲区
 	md3dImmediateContext->ClearDepthStencilView(shadowMapDSV.Get(),D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,1.0,0);
-
+	// 剔除正面
+	md3dImmediateContext->RSSetState(cullFrontFaceState.Get());
+	// 设置视口
+	md3dImmediateContext->RSSetViewports(1,&renderShadowMapViewPort);
+	
 	auto eyePos = XMLoadFloat3(&light.pos);
 	auto lightDir = -XMLoadFloat3(&light.dir);
 	auto focusPos = eyePos + lightDir;
 	auto upDir = XMVectorSet(0, 1, 0, 0);
 
 	auto view = XMMatrixLookAtLH(eyePos,focusPos,upDir);
-	//auto proj = XMMatrixOrthographicLH(10,10,0.1,50);
-	//auto proj = XMMatrixOrthographicOffCenterLH(
-	//	shadowOrthProjInfo.left,
-	//	shadowOrthProjInfo.right,
-	//	shadowOrthProjInfo.bottom,
-	//	shadowOrthProjInfo.top,
-	//	shadowOrthProjInfo.Near,
-	//	shadowOrthProjInfo.Far);
-	float maxLength = max(
+	auto proj = XMMatrixOrthographicLH(
 		shadowOrthProjInfo.right - shadowOrthProjInfo.left,
-		shadowOrthProjInfo.top - shadowOrthProjInfo.bottom
+		shadowOrthProjInfo.top - shadowOrthProjInfo.bottom,
+		0,
+		shadowOrthProjInfo.Far - shadowOrthProjInfo.Near
 	);
-	//auto proj = XMMatrixOrthographicLH(
-	//	shadowOrthProjInfo.right - shadowOrthProjInfo.left,
-	//	shadowOrthProjInfo.top - shadowOrthProjInfo.bottom,
-	//	0,
-	//	shadowOrthProjInfo.Far - shadowOrthProjInfo.Near
-	//);
-	auto proj = XMMatrixOrthographicLH(maxLength,maxLength,0,shadowOrthProjInfo.Far - shadowOrthProjInfo.Near);
 
-	auto model = XMMatrixTranslation(0, 3, 0);
+	auto model = XMMatrixScaling(2,2,2) * XMMatrixTranslation(0, 3, 0);
 	auto mvp = model * view * proj;
 	renderShadowMapShader->SetMatrix4x4("mvp", mvp);
 	boxMesh->Draw(renderShadowMapShader, md3dImmediateContext.Get());
@@ -331,4 +362,10 @@ void Sample7::RenderShadowMap() {
 	mvp = model * view * proj;
 	renderShadowMapShader->SetMatrix4x4("mvp", mvp);
 	boxMesh->Draw(renderShadowMapShader, md3dImmediateContext.Get());
+
+	// 恢复默认光栅化设置
+	md3dImmediateContext->RSSetState(NULL);
+	// 恢复默认视口
+	md3dImmediateContext->RSSetViewports(1,&mScreenViewport);
+	
 }

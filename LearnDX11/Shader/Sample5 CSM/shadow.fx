@@ -1,13 +1,13 @@
 #include "../Common/Light.hlsl"
 
 cbuffer cbPerObject{
+    // 用于将物体从世界空间转换到光源空间,是一个VP矩阵
+    matrix lightVPMatrix;
     // 移除平移操作后的vp矩阵
     matrix mvp;
     matrix model;
     matrix transInvModel;
     Light light;
-    // 用于将物体从世界空间转换到光源空间,是一个VP矩阵
-    matrix lightVPMatrix;
     float3 viewPos;
 };
 
@@ -15,6 +15,13 @@ Texture2D mainTex;
 
 // 点光源阴影贴图
 Texture2D shadowMap;
+
+SamplerState shadowSamplerState{
+    Filter =  MIN_MAG_MIP_LINEAR;
+    AddressU = Border;
+    AddressV = Border;
+    BorderColor = float4(1,1,1,1);
+};
 
 SamplerState state1{
     Filter =  MIN_MAG_MIP_LINEAR;
@@ -51,7 +58,7 @@ vertexOut vert(vertexIn v){
 float4 pixel(vertexOut i) : SV_Target{    
 
     float3 diff = ProcessLightDiffuseWithLambert(light,i.worldNormal,i.worldPos);
-    float3 specu = ProcessLightSpecWithLambert(light,i.worldNormal,i.worldPos,viewPos,32);
+    float3 specu = ProcessLightSpecWithLambert(light,i.worldNormal,i.worldPos,viewPos,255);
 
     float3 texColor = mainTex.Sample(state1,i.uv).rgb;
     float3 albedo = diff * texColor;
@@ -73,11 +80,14 @@ float4 pixel(vertexOut i) : SV_Target{
     float shadowBias = 0.005;
 
     // 采样获得当前片元坐标在光源空间下的最近深度
-    float nearestDepth = shadowMap.Sample(state1,uv).r + shadowBias;
+    float nearestDepth = shadowMap.Sample(shadowSamplerState,uv).r + shadowBias;
     // 如果当前片元深度小于等于最近深度,那么当前片元可见,否则处于阴影下
     float shadowFactor = depth > nearestDepth ? 1 : 0;
 
+    if(shadowUV.z>1.0) shadowFactor = 0;
+
     return float4( (albedo + specu) * (1-shadowFactor) + ambient,1.0);
+    // return float4(nearestDepth,nearestDepth,nearestDepth,1.0);
 }
 
 technique11{

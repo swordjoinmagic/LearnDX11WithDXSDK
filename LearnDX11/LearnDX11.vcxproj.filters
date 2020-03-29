@@ -126,6 +126,9 @@
     <ClCompile Include="SpriteRender.cpp">
       <Filter>源文件\Component</Filter>
     </ClCompile>
+    <ClCompile Include="Sample8_ShadowTest.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -196,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="SpriteRender.h">
       <Filter>头文件\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample8_ShadowTest.h">
+      <Filter>头文件\Sample</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

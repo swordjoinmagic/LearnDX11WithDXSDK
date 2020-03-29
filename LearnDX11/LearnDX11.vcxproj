@@ -199,6 +199,7 @@
     <ClCompile Include="Sample5_Deffered.cpp" />
     <ClCompile Include="Sample6_QuadTree.cpp" />
     <ClCompile Include="Sample7_CSM.cpp" />
+    <ClCompile Include="Sample8_ShadowTest.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SpriteRender.cpp" />
     <ClCompile Include="Texture2D.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="Sample5_Deffered.h" />
     <ClInclude Include="Sample6_QuadTree.h" />
     <ClInclude Include="Sample7_CSM.h" />
+    <ClInclude Include="Sample8_ShadowTest.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SpriteRender.h" />
     <ClInclude Include="Texture2D.h" />
