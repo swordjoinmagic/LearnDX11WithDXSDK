@@ -64,6 +64,12 @@
     <Filter Include="Shader\Sample5 CSM">
       <UniqueIdentifier>{cee26c9c-2ec4-4d89-8298-848b41c8cd38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Sample6 ParticleSystem">
+      <UniqueIdentifier>{d96fd211-f691-4274-ab28-371d1eb95cd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Sample6 ParticleSystem\Fire">
+      <UniqueIdentifier>{6ef7df5b-759e-44a8-b87c-3edb6e741948}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d3dApp.cpp">
@@ -127,6 +133,15 @@
       <Filter>源文件\Component</Filter>
     </ClCompile>
     <ClCompile Include="Sample8_ShadowTest.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>源文件\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample9_ParticleSystem.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample10_StreamOutTest.cpp">
       <Filter>源文件\Sample</Filter>
     </ClCompile>
   </ItemGroup>
@@ -203,6 +218,15 @@
     <ClInclude Include="Sample8_ShadowTest.h">
       <Filter>头文件\Sample</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>头文件\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample9_ParticleSystem.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample10_StreamOutTest.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\Common\WhiteObject.fx">
@@ -246,6 +270,12 @@
     </FxCompile>
     <FxCompile Include="Shader\Sample5 CSM\shadow.fx">
       <Filter>Shader\Sample5 CSM</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample6 ParticleSystem\Fire\controlShader.fx">
+      <Filter>Shader\Sample6 ParticleSystem\Fire</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample6 ParticleSystem\Fire\effectShader.fx">
+      <Filter>Shader\Sample6 ParticleSystem\Fire</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

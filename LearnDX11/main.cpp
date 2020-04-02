@@ -12,11 +12,13 @@
 #include "Sample6_QuadTree.h"
 #include "Sample7_CSM.h"
 #include "Sample8_ShadowTest.h"
+#include "Sample9_ParticleSystem.h"
+#include "Sample10_StreamOutTest.h"
 
 int main()
 {
 	HINSTANCE hInstance = GetModuleHandle(0);
-	Sample7 sample(hInstance);
+	Sample9 sample(hInstance);
 	if (!sample.Init()) {
 		std::cout << "应用程序初始化错误!!!" << std::endl;
 	}

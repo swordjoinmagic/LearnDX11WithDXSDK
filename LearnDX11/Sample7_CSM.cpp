@@ -3,6 +3,8 @@
 #include "MathF.h"
 
 void Sample7::OnStart() {
+	
+
 	// 初始化摄像机
 	camera = std::make_shared<SJM::Camera>(float3(0, 3, -5), float3(0, 0, 0), AspectRatio());
 	camera->Near = 1;
@@ -57,9 +59,6 @@ void Sample7::OnStart() {
 
 #pragma endregion
 
-	// 获得世界空间光源摄像机的坐标
-	// 获得光源摄像机各参数
-	CalculateCameraCorners();
 
 	// 初始化SpriteRender
 	spriteRender = std::make_shared<SpriteRender>(md3dDevice,mClientWidth,mClientHeight);
@@ -67,11 +66,12 @@ void Sample7::OnStart() {
 	// 初始化渲染深度图的Shader
 	renderShadowMapShader = std::make_shared<Shader>(L"Shader/Sample5 CSM/Compiled/renderShadowMap.fxo",md3dDevice.Get());
 
-
+	// 正向剔除的渲染状态
 	CD3D11_RASTERIZER_DESC cullFrontFaceStateDesc = CD3D11_RASTERIZER_DESC(D3D11_DEFAULT);
 	cullFrontFaceStateDesc.CullMode = D3D11_CULL_FRONT;
 	HR(md3dDevice->CreateRasterizerState(&cullFrontFaceStateDesc,cullFrontFaceState.GetAddressOf()));
 
+	// 用于渲染阴影贴图的视口
 	renderShadowMapViewPort.TopLeftX = 0;
 	renderShadowMapViewPort.TopLeftY = 0;
 	renderShadowMapViewPort.Width = static_cast<float>(textureSize);
@@ -79,7 +79,13 @@ void Sample7::OnStart() {
 	renderShadowMapViewPort.MinDepth = 0.0f;
 	renderShadowMapViewPort.MaxDepth = 1.0f;
 
-
+	// 初始化5*5个箱子的位置
+	boxPositions.resize(25);
+	for (uint i = 0; i < 5; i++) {
+		for (uint j = 0; j < 5;j++) {
+			boxPositions[i * 5 + j] = float3(i*3,3,j*3);
+		}
+	}
 }
 
 void Sample7::CalculateCameraCorners() {
@@ -304,18 +310,21 @@ void Sample7::RenderScene() {
 	boxShader->SetFloat3("viewPos", camera->pos);
 	boxShader->SetShaderResource("shadowMap", shadowMapSRV.Get());
 	boxShader->SetMatrix4x4("lightVPMatrix",lightVPMatrix);
-	auto model = XMMatrixScaling(2, 2, 2) * XMMatrixTranslation(0,3,0);
+
+	for (uint i = 0; i < boxPositions.size(); i++) {
+		auto model = XMMatrixScaling(2, 2, 2) * XMMatrixTranslation(boxPositions[i].x, boxPositions[i].y, boxPositions[i].z);
+		auto transInvModel = XMMatrixTranspose(GetInverseMatrix(model));
+		auto mvp = model * view * proj;
+		boxShader->SetMatrix4x4("mvp", mvp);
+		boxShader->SetMatrix4x4("model", model);
+		boxShader->SetMatrix4x4("transInvModel", transInvModel);
+		boxShader->SetTexture2D("mainTex", boxTexture);
+		boxMesh->Draw(boxShader, md3dImmediateContext.Get());
+	}
+
+	auto model = XMMatrixScaling(50,0.2,50);
 	auto transInvModel = XMMatrixTranspose(GetInverseMatrix(model));
 	auto mvp = model * view * proj;
-	boxShader->SetMatrix4x4("mvp",mvp);
-	boxShader->SetMatrix4x4("model",model);
-	boxShader->SetMatrix4x4("transInvModel",transInvModel);
-	boxShader->SetTexture2D("mainTex",boxTexture);
-	boxMesh->Draw(boxShader,md3dImmediateContext.Get());
-
-	model = XMMatrixScaling(20,0.2,20);
-	transInvModel = XMMatrixTranspose(GetInverseMatrix(model));
-	mvp = model * view * proj;
 	boxShader->SetMatrix4x4("mvp",mvp);
 	boxShader->SetMatrix4x4("model", model);
 	boxShader->SetMatrix4x4("transInvModel", transInvModel);
@@ -352,14 +361,16 @@ void Sample7::RenderShadowMap() {
 		0,
 		shadowOrthProjInfo.Far - shadowOrthProjInfo.Near
 	);
+	
+	for (uint i = 0; i < boxPositions.size(); i++) {
+		auto model = XMMatrixScaling(2, 2, 2) * XMMatrixTranslation(boxPositions[i].x, boxPositions[i].y, boxPositions[i].z);
+		auto mvp = model * view * proj;
+		renderShadowMapShader->SetMatrix4x4("mvp", mvp);
+		boxMesh->Draw(renderShadowMapShader, md3dImmediateContext.Get());
+	}
 
-	auto model = XMMatrixScaling(2,2,2) * XMMatrixTranslation(0, 3, 0);
+	auto model = XMMatrixScaling(50, 0.2, 50);
 	auto mvp = model * view * proj;
-	renderShadowMapShader->SetMatrix4x4("mvp", mvp);
-	boxMesh->Draw(renderShadowMapShader, md3dImmediateContext.Get());
-
-	model = XMMatrixScaling(20, 0.2, 20);
-	mvp = model * view * proj;
 	renderShadowMapShader->SetMatrix4x4("mvp", mvp);
 	boxMesh->Draw(renderShadowMapShader, md3dImmediateContext.Get());
 

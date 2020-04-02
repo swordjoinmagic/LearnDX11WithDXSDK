@@ -46,6 +46,8 @@ private:
 
 	uint textureSize = 1024;
 	D3D11_VIEWPORT renderShadowMapViewPort;
+
+	std::vector<float3> boxPositions;
 public:
 	Sample7(HINSTANCE hInstance) : D3DApp(hInstance) {}
 	void OnStart() override;

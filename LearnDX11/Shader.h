@@ -10,6 +10,12 @@
 
 */
 class Shader {
+public:
+	struct ShaderInputSign {
+		byte* pIAInputSignature;
+		size_t IAInputSignatureSize;
+	};
+	ShaderInputSign GetInputSign();
 private:
 	ComPtr<ID3DX11Effect> effect;
 	ID3DX11EffectTechnique* technique;
@@ -21,10 +27,13 @@ private:
 	uint passCount;
 public:
 	// 根据已编译的着色器文件创建着色器对象
-	Shader(const std::wstring &filePath, ID3D11Device* d3dDevice);
+	Shader(const std::wstring &filePath, ID3D11Device* d3dDevice,bool createInputLayout = true);
+	
 
 	// 在使用该着色器绘制前必须调用的函数,表示应用某个Pass的绘制环境变量设置
 	void UsePass(int passIndex, ID3D11DeviceContext* deviceContext) const;
+
+	void UsePass(int passIndex, ID3D11InputLayout* inputLayout ,ID3D11DeviceContext* deviceContext) const;
 
 #pragma region 为Shader设置各类变量的方法
 	void SetMatrix4x4(const std::string& paramName, const float4x4 &value);

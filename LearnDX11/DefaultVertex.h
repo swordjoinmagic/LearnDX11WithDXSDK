@@ -27,3 +27,14 @@ public:
 		texcoord = float2(u, v);
 	}
 };
+
+struct Particle {
+public:
+	XMFLOAT3 InitialPos;
+	XMFLOAT3 InitialVel;
+	XMFLOAT2 Size;
+	float Age;
+	unsigned int Type;
+public:
+	Particle() { ZeroMemory(this, sizeof(Particle)); }
+};

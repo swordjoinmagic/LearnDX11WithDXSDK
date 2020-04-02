@@ -1,6 +1,8 @@
 #include "Shader.h"
 
-Shader::Shader(const std::wstring &filePath, ID3D11Device* d3dDevice) {
+Shader::Shader(const std::wstring &filePath, ID3D11Device* d3dDevice, bool createInputLayout) {
+	
+
 	ID3DBlob* csBuffer = LoadCompiledShaderFromFile(filePath);
 	D3DX11CreateEffectFromMemory(csBuffer->GetBufferPointer(),csBuffer->GetBufferSize(),0,d3dDevice,effect.GetAddressOf());
 
@@ -12,25 +14,27 @@ Shader::Shader(const std::wstring &filePath, ID3D11Device* d3dDevice) {
 	technique->GetDesc(&techniqueDesc);
 	passCount = techniqueDesc.Passes;	
 
-	inputLayouts.resize(passCount);
-	// 初始化输入布局
-	D3D11_INPUT_ELEMENT_DESC inputElementsDesc[] = {
-		{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"TANGENT",0,DXGI_FORMAT_R32G32B32_FLOAT,0,24,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,36,D3D11_INPUT_PER_VERTEX_DATA,0}
-	};
-	for (uint i = 0; i < passCount;i++) {
+	if (createInputLayout) {
+		inputLayouts.resize(passCount);
+		// 初始化输入布局
+		D3D11_INPUT_ELEMENT_DESC inputElementsDesc[] = {
+			{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+			{"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
+			{"TANGENT",0,DXGI_FORMAT_R32G32B32_FLOAT,0,24,D3D11_INPUT_PER_VERTEX_DATA,0},
+			{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,36,D3D11_INPUT_PER_VERTEX_DATA,0}
+		};
+		for (uint i = 0; i < passCount; i++) {
 
-		D3DX11_PASS_DESC passDesc;
-		technique->GetPassByIndex(i)->GetDesc(&passDesc);
+			D3DX11_PASS_DESC passDesc;
+			technique->GetPassByIndex(i)->GetDesc(&passDesc);
 
-		d3dDevice->CreateInputLayout(
-			inputElementsDesc,
-			4,
-			passDesc.pIAInputSignature,
-			passDesc.IAInputSignatureSize,
-			inputLayouts[i].GetAddressOf());
+			d3dDevice->CreateInputLayout(
+				inputElementsDesc,
+				4,
+				passDesc.pIAInputSignature,
+				passDesc.IAInputSignatureSize,
+				inputLayouts[i].GetAddressOf());
+		}
 	}
 }
 
@@ -41,6 +45,15 @@ void Shader::UsePass(int passIndex, ID3D11DeviceContext* deviceContext) const{
 	// 设置顶点输入布局
 	deviceContext->IASetInputLayout(inputLayouts[passIndex].Get());
 }
+
+void Shader::UsePass(int passIndex, ID3D11InputLayout* inputLayout, ID3D11DeviceContext* deviceContext) const {
+	// 应用目标pass
+	technique->GetPassByIndex(passIndex)->Apply(0, deviceContext);
+
+	// 设置顶点输入布局
+	deviceContext->IASetInputLayout(inputLayout);
+}
+
 
 void Shader::SetFloat(const std::string &paramName, float value) {
 	HR(effect->GetVariableByName(paramName.c_str())->SetRawValue(&value, 0, sizeof(value)));
@@ -89,4 +102,17 @@ uint Shader::GetPassCount() const{
 
 void Shader::Release() {
 	inputLayouts.clear();	
+}
+
+Shader::ShaderInputSign Shader::GetInputSign() {
+
+	D3DX11_PASS_DESC passDesc;
+	technique->GetPassByIndex(0)->GetDesc(&passDesc);
+
+
+	ShaderInputSign inputSign;
+	inputSign.pIAInputSignature = passDesc.pIAInputSignature;
+	inputSign.IAInputSignatureSize = passDesc.IAInputSignatureSize;
+
+	return inputSign;
 }
