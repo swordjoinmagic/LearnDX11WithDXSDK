@@ -14,11 +14,12 @@
 #include "Sample8_ShadowTest.h"
 #include "Sample9_ParticleSystem.h"
 #include "Sample10_StreamOutTest.h"
+#include "Sample11_CascadedShadowMap.h"
 
 int main()
 {
 	HINSTANCE hInstance = GetModuleHandle(0);
-	Sample9 sample(hInstance);
+	Sample11 sample(hInstance);
 	if (!sample.Init()) {
 		std::cout << "应用程序初始化错误!!!" << std::endl;
 	}

@@ -42,6 +42,7 @@ public:
 	void SetFloat3(const std::string& paramName, const float3 &value);
 	void SetFloat2(const std::string& paramName, const float2 &value);
 	void SetFloat(const std::string& paramName, float value);
+	void SetUInt(const std::string& paramName, uint value);
 	void SetVector(const std::string& paramName, XMVECTOR &value);
 	void SetRawValue(const std::string& paramName, const void *pData, uint size);
 	void SetShaderResource(const std::string& paramName, ID3D11ShaderResourceView* value);

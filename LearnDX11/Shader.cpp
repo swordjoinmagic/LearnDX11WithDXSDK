@@ -55,6 +55,10 @@ void Shader::UsePass(int passIndex, ID3D11InputLayout* inputLayout, ID3D11Device
 }
 
 
+void Shader::SetUInt(const std::string &paramName, uint value) {
+	HR(effect->GetVariableByName(paramName.c_str())->SetRawValue(&value,0,sizeof(value)));
+}
+
 void Shader::SetFloat(const std::string &paramName, float value) {
 	HR(effect->GetVariableByName(paramName.c_str())->SetRawValue(&value, 0, sizeof(value)));
 }

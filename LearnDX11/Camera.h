@@ -67,7 +67,7 @@ namespace SJM {
 		// 处理鼠标滚轮
 		void ProcessMouseScroll(float yOffset);
 
-	private:
+	public:
 		// 根据当前俯仰角和偏航角更新当前摄像机方向
 		void updateCameraDirection();
 	};

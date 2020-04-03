@@ -48,6 +48,9 @@ private:
 	D3D11_VIEWPORT renderShadowMapViewPort;
 
 	std::vector<float3> boxPositions;
+
+	float maxDistance;
+	float maxZ, minZ;
 public:
 	Sample7(HINSTANCE hInstance) : D3DApp(hInstance) {}
 	void OnStart() override;

@@ -8,6 +8,12 @@ void Sample7::OnStart() {
 	// 初始化摄像机
 	camera = std::make_shared<SJM::Camera>(float3(0, 3, -5), float3(0, 0, 0), AspectRatio());
 	camera->Near = 1;
+	camera->Far = 100;
+
+	camera->Yaw = 35.0999641f;
+	camera->Pitch = -27.6000004f;
+	camera->pos = float3(-17.4107323f,13.6456404f,- 7.66027975f);
+	camera->updateCameraDirection();
 
 	// 初始化平行光
 	light.pos = float3(0,0,0);
@@ -83,12 +89,13 @@ void Sample7::OnStart() {
 	boxPositions.resize(25);
 	for (uint i = 0; i < 5; i++) {
 		for (uint j = 0; j < 5;j++) {
-			boxPositions[i * 5 + j] = float3(i*3,3,j*3);
+			boxPositions[i * 5 + j] = float3(i*10,3,j*10);
 		}
 	}
 }
 
 void Sample7::CalculateCameraCorners() {
+#pragma region 相似三角形求观察空间下主摄像机视椎体八个顶点位置
 	float aspect = camera->aspect;
 	
 	// 横向的FOV角的tan值(用于计算近平面和远平面的x)
@@ -123,7 +130,33 @@ void Sample7::CalculateCameraCorners() {
 	cameraConrners[6] = float4(xf,-yf,camera->Far,1.0);
 	// 左下角
 	cameraConrners[7] = float4(-xf,-yf,camera->Far,1.0);
+#pragma endregion
 
+#pragma region 逆矩阵法,求主摄像机视椎体八个顶点位置
+
+	//auto projM = camera->GetProjMatrix();
+	//auto viewM = camera->GetViewMatrix();
+	//auto invProj = GetInverseMatrix(projM);
+	//auto invVPM = GetInverseMatrix(viewM * projM);
+
+	//float4 vecFrustum[8] = {
+	//	float4(1.0f, 1.0f, 0.0f,1.0f),  // 右上角
+	//	float4(-1.0f, 1.0f, 0.0f,1.0f), // 左上角
+	//	float4(1.0f, -1.0f, 0.0f,1.0f), // 右下角
+	//	float4(-1.0f, -1.0f, 0.0f,1.0f), // 左下角
+	//	float4(1.0f, 1.0f, 1.0f,1.0f), // 右上角
+	//	float4(-1.0f, 1.0f, 1.0f,1.0f), // 左上角
+	//	float4(1.0f, -1.0f, 1.0f,1.0f), // 右下角
+	//	float4(-1.0f, -1.0f, 1.0f,1.0f) // 左下角
+	//};
+	//for (uint i = 0; i < 8; i++) {
+	//	XMVECTOR frustumPos = XMLoadFloat4(&vecFrustum[i]);
+	//	XMVECTOR cameraConrnersPos = XMVector4Transform(frustumPos, invVPM);
+	//	cameraConrnersPos /= XMVectorGetW(cameraConrnersPos);
+	//	XMStoreFloat4(&cameraConrners[i], cameraConrnersPos);
+	//}
+	
+#pragma endregion
 
 	auto viewMatrix = camera->GetViewMatrix();
 	// 计算view的逆矩阵,用于将主摄像机的八个角从观察空间转换到世界空间
@@ -168,24 +201,32 @@ void Sample7::CalculateCameraCorners() {
 	// 约束光源以Texel为增量进行移动
 	XMVECTOR minValue = XMLoadFloat3(&minPoint);
 	XMVECTOR maxValue = XMLoadFloat3(&maxPoint);
-	XMVECTOR vFrustumPoints0 = XMLoadFloat4(&cameraConrners[0]);
-	XMVECTOR vFrustumPoints6 = XMLoadFloat4(&cameraConrners[7]);
+	XMVECTOR vFrustumNearMaxPoint = XMLoadFloat4(&cameraConrners[0]);
+	XMVECTOR vFrustumNearMinPoint = XMLoadFloat4(&cameraConrners[3]);
+	XMVECTOR vFrustumFarMinPoint = XMLoadFloat4(&cameraConrners[7]);
+	XMVECTOR vFrustumFarMaxPoint = XMLoadFloat4(&cameraConrners[4]);
 
 	float minZ = XMVectorGetZ(minValue);
 	float maxZ = XMVectorGetZ(maxValue);
 
-	XMVECTOR vDiagonal = XMVector3Length(vFrustumPoints0 - vFrustumPoints6);
+	float farDist = XMVectorGetX(XMVector3Length(vFrustumFarMaxPoint - vFrustumFarMinPoint));
+	float crossDist = XMVectorGetX(XMVector3Length(vFrustumFarMaxPoint - vFrustumNearMinPoint));
+	float maxDist = farDist > crossDist ? farDist : crossDist;
+	maxDistance = maxDist;
+#pragma region DX SDK 阴影防抖的做法
+	XMVECTOR vDiagonal = XMVector3Length(vFrustumNearMaxPoint - vFrustumFarMinPoint);
+	//XMVECTOR vDiagonal = XMVectorSet(maxDist,maxDist,maxDist,1.0);
 
-	float fCascadeBoung = XMVectorGetX(vDiagonal);
+	float fCascadeBoung = XMVectorGetX(vDiagonal);	
 
-	XMVECTOR vBorderOffset = (vDiagonal - (maxValue - minValue)) * XMVectorSet(0.5,0.5,0.5,0.5);
-	vBorderOffset *= XMVectorSet(1,1,0,0);
+	XMVECTOR vBorderOffset = (vDiagonal - (maxValue - minValue)) * XMVectorSet(0.5, 0.5, 0.5, 0.5);
+	vBorderOffset *= XMVectorSet(1, 1, 0, 0);
 
 	maxValue += vBorderOffset;
 	minValue -= vBorderOffset;
 
 	// 计算阴影贴图的每个纹素
-	XMVECTOR fWorldUnitPerTexel = XMVectorSet(fCascadeBoung / textureSize, fCascadeBoung  / textureSize, 1, 1);
+	XMVECTOR fWorldUnitPerTexel = XMVectorSet(fCascadeBoung / textureSize, fCascadeBoung / textureSize, 1, 1);
 
 	// 让包围盒的minValue和maxValue为纹素的倍数
 	minValue /= fWorldUnitPerTexel;
@@ -196,10 +237,42 @@ void Sample7::CalculateCameraCorners() {
 	maxValue = XMVectorFloor(maxValue);
 	maxValue *= fWorldUnitPerTexel;
 
-	XMStoreFloat3(&minPoint,minValue);
+	XMStoreFloat3(&minPoint, minValue);
 	minPoint.z = minZ;
-	XMStoreFloat3(&maxPoint,maxValue);
+	XMStoreFloat3(&maxPoint, maxValue);
 	maxPoint.z = maxZ;
+#pragma endregion
+
+#pragma region 仿照知乎大佬的阴影防抖
+
+	//this->maxZ = maxPoint.z; this->minZ = minPoint.z;
+	//float minX = minPoint.x; float maxX = maxPoint.x;
+	//float minY = minPoint.y; float maxY = maxPoint.y;
+	//float fWorldUnitsPerTexel = maxDist / (float)textureSize;
+	//
+	//float posX = (minX + maxX)*0.5f;
+	//posX /= fWorldUnitsPerTexel;
+	//posX = floor(posX);
+	//posX *= fWorldUnitsPerTexel;
+
+	//float posY = (minY + maxY)*0.5f;
+	//posY /= fWorldUnitsPerTexel;
+	//posY = floor(posY);
+	//posY *= fWorldUnitsPerTexel;
+
+	//float posZ = this->minZ;
+	//posZ /= fWorldUnitsPerTexel;
+	//posZ = floor(posZ);
+	//posZ *= fWorldUnitsPerTexel;
+
+	//float3 center = float3(posX, posY, posZ);
+
+	//lcPos = center;
+
+	//return;
+
+#pragma endregion
+
 
 #pragma endregion
 
@@ -249,9 +322,6 @@ void Sample7::CalculateCameraCorners() {
 
 	// 获得光源摄像机在世界空间的坐标
 	XMStoreFloat3(&lcPos,lightCameraPos);
-
-
-
 	
 }
 
@@ -299,6 +369,11 @@ void Sample7::RenderScene() {
 		0,
 		shadowOrthProjInfo.Far - shadowOrthProjInfo.Near
 	);
+	//auto lightProj = XMMatrixOrthographicLH(
+	//	maxDistance, maxDistance,
+	//	0,
+	//	shadowOrthProjInfo.Far - shadowOrthProjInfo.Near
+	//);
 
 	auto lightVPMatrix = lightView * lightProj;
 #pragma endregion
@@ -322,7 +397,7 @@ void Sample7::RenderScene() {
 		boxMesh->Draw(boxShader, md3dImmediateContext.Get());
 	}
 
-	auto model = XMMatrixScaling(50,0.2,50);
+	auto model = XMMatrixScaling(200,0.2,200);
 	auto transInvModel = XMMatrixTranspose(GetInverseMatrix(model));
 	auto mvp = model * view * proj;
 	boxShader->SetMatrix4x4("mvp",mvp);
@@ -361,6 +436,12 @@ void Sample7::RenderShadowMap() {
 		0,
 		shadowOrthProjInfo.Far - shadowOrthProjInfo.Near
 	);
+	//auto proj = XMMatrixOrthographicLH(
+	//	maxDistance, maxDistance,
+	//	0,
+	//	shadowOrthProjInfo.Far - shadowOrthProjInfo.Near
+	//);
+
 	
 	for (uint i = 0; i < boxPositions.size(); i++) {
 		auto model = XMMatrixScaling(2, 2, 2) * XMMatrixTranslation(boxPositions[i].x, boxPositions[i].y, boxPositions[i].z);
@@ -369,7 +450,7 @@ void Sample7::RenderShadowMap() {
 		boxMesh->Draw(renderShadowMapShader, md3dImmediateContext.Get());
 	}
 
-	auto model = XMMatrixScaling(50, 0.2, 50);
+	auto model = XMMatrixScaling(200, 0.2, 200);
 	auto mvp = model * view * proj;
 	renderShadowMapShader->SetMatrix4x4("mvp", mvp);
 	boxMesh->Draw(renderShadowMapShader, md3dImmediateContext.Get());

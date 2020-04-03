@@ -144,6 +144,9 @@
     <ClCompile Include="Sample10_StreamOutTest.cpp">
       <Filter>源文件\Sample</Filter>
     </ClCompile>
+    <ClCompile Include="Sample11_CascadedShadowMap.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -227,6 +230,9 @@
     <ClInclude Include="Sample10_StreamOutTest.h">
       <Filter>头文件\Sample</Filter>
     </ClInclude>
+    <ClInclude Include="Sample11_CascadedShadowMap.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\Common\WhiteObject.fx">
@@ -276,6 +282,12 @@
     </FxCompile>
     <FxCompile Include="Shader\Sample6 ParticleSystem\Fire\effectShader.fx">
       <Filter>Shader\Sample6 ParticleSystem\Fire</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample5 CSM\tex2DArrayTest.fx">
+      <Filter>Shader\Sample5 CSM</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample5 CSM\CSM.fx">
+      <Filter>Shader\Sample5 CSM</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
