@@ -195,6 +195,7 @@
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Sample10_StreamOutTest.cpp" />
     <ClCompile Include="Sample11_CascadedShadowMap.cpp" />
+    <ClCompile Include="Sample12_FrustumWithQuadTree.cpp" />
     <ClCompile Include="Sample1_Cube.cpp" />
     <ClCompile Include="Sample2_SkyBox.cpp" />
     <ClCompile Include="Sample3_Light.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Sample10_StreamOutTest.h" />
     <ClInclude Include="Sample11_CascadedShadowMap.h" />
+    <ClInclude Include="Sample12_FrustumWithQuadTree.h" />
     <ClInclude Include="Sample1_Cube.h" />
     <ClInclude Include="Sample2_SkyBox.h" />
     <ClInclude Include="Sample3_Light.h" />
@@ -258,6 +260,7 @@
     </FxCompile>
     <FxCompile Include="Shader\Sample1 CubeMap\cubeMap.fx" />
     <FxCompile Include="Shader\Sample1 CubeMap\skyBox.fx" />
+    <FxCompile Include="Shader\Sample2 Light\parallelLight.fx" />
     <FxCompile Include="Shader\Sample2 Light\pointLight.hlsl">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AssemblyCodeAndHex</AssemblerOutput>
       <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RelativeDir)/Compiled/Assmebly/%(Filename).assembly</AssemblerOutputFile>

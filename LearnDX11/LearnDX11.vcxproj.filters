@@ -147,6 +147,9 @@
     <ClCompile Include="Sample11_CascadedShadowMap.cpp">
       <Filter>源文件\Sample</Filter>
     </ClCompile>
+    <ClCompile Include="Sample12_FrustumWithQuadTree.cpp">
+      <Filter>源文件\Sample</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -233,6 +236,9 @@
     <ClInclude Include="Sample11_CascadedShadowMap.h">
       <Filter>头文件\Sample</Filter>
     </ClInclude>
+    <ClInclude Include="Sample12_FrustumWithQuadTree.h">
+      <Filter>头文件\Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\Common\WhiteObject.fx">
@@ -288,6 +294,9 @@
     </FxCompile>
     <FxCompile Include="Shader\Sample5 CSM\CSM.fx">
       <Filter>Shader\Sample5 CSM</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Sample2 Light\parallelLight.fx">
+      <Filter>Shader\Sample2 Light</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
