@@ -33,7 +33,7 @@ public:
 	// 在使用该着色器绘制前必须调用的函数,表示应用某个Pass的绘制环境变量设置
 	void UsePass(int passIndex, ID3D11DeviceContext* deviceContext) const;
 
-	void UsePass(int passIndex, ID3D11InputLayout* inputLayout ,ID3D11DeviceContext* deviceContext) const;
+	void UsePass(int passIndex, ID3D11InputLayout* inputLayout ,ID3D11DeviceContext* deviceContext) const;	
 
 #pragma region 为Shader设置各类变量的方法
 	void SetMatrix4x4(const std::string& paramName, const float4x4 &value);

@@ -103,7 +103,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d10.lib;Effects11.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;legacy_stdio_definitions.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimpd.lib;d3d10.lib;Effects11.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;legacy_stdio_definitions.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -124,7 +124,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d10.lib;Effects11.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;legacy_stdio_definitions.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimpd.lib;d3d10.lib;Effects11.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;legacy_stdio_definitions.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -149,7 +149,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d10.lib;Effects11.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;legacy_stdio_definitions.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimpd.lib;d3d10.lib;Effects11.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;legacy_stdio_definitions.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -174,7 +174,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d10.lib;Effects11.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;legacy_stdio_definitions.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimpd.lib;d3d10.lib;Effects11.lib;d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;dxgi.lib;legacy_stdio_definitions.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -192,10 +192,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathF.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Sample10_StreamOutTest.cpp" />
     <ClCompile Include="Sample11_CascadedShadowMap.cpp" />
     <ClCompile Include="Sample12_FrustumWithQuadTree.cpp" />
+    <ClCompile Include="Sample13_Animation.cpp" />
     <ClCompile Include="Sample1_Cube.cpp" />
     <ClCompile Include="Sample2_SkyBox.cpp" />
     <ClCompile Include="Sample3_Light.cpp" />
@@ -206,11 +208,48 @@
     <ClCompile Include="Sample8_ShadowTest.cpp" />
     <ClCompile Include="Sample9_ParticleSystem.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SkinMesh.cpp" />
     <ClCompile Include="SpriteRender.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="xnacollision.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="assimp\ai_assert.h" />
+    <ClInclude Include="assimp\anim.h" />
+    <ClInclude Include="assimp\camera.h" />
+    <ClInclude Include="assimp\cexport.h" />
+    <ClInclude Include="assimp\cfileio.h" />
+    <ClInclude Include="assimp\cimport.h" />
+    <ClInclude Include="assimp\color4.h" />
+    <ClInclude Include="assimp\Compiler\poppack1.h" />
+    <ClInclude Include="assimp\Compiler\pstdint.h" />
+    <ClInclude Include="assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="assimp\config.h" />
+    <ClInclude Include="assimp\DefaultLogger.hpp" />
+    <ClInclude Include="assimp\defs.h" />
+    <ClInclude Include="assimp\Exporter.hpp" />
+    <ClInclude Include="assimp\Importer.hpp" />
+    <ClInclude Include="assimp\importerdesc.h" />
+    <ClInclude Include="assimp\IOStream.hpp" />
+    <ClInclude Include="assimp\IOSystem.hpp" />
+    <ClInclude Include="assimp\light.h" />
+    <ClInclude Include="assimp\Logger.hpp" />
+    <ClInclude Include="assimp\LogStream.hpp" />
+    <ClInclude Include="assimp\material.h" />
+    <ClInclude Include="assimp\matrix3x3.h" />
+    <ClInclude Include="assimp\matrix4x4.h" />
+    <ClInclude Include="assimp\mesh.h" />
+    <ClInclude Include="assimp\metadata.h" />
+    <ClInclude Include="assimp\NullLogger.hpp" />
+    <ClInclude Include="assimp\postprocess.h" />
+    <ClInclude Include="assimp\ProgressHandler.hpp" />
+    <ClInclude Include="assimp\quaternion.h" />
+    <ClInclude Include="assimp\scene.h" />
+    <ClInclude Include="assimp\texture.h" />
+    <ClInclude Include="assimp\types.h" />
+    <ClInclude Include="assimp\vector2.h" />
+    <ClInclude Include="assimp\vector3.h" />
+    <ClInclude Include="assimp\version.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="d3dApp.h" />
@@ -223,10 +262,12 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="MathF.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshLoader.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Sample10_StreamOutTest.h" />
     <ClInclude Include="Sample11_CascadedShadowMap.h" />
     <ClInclude Include="Sample12_FrustumWithQuadTree.h" />
+    <ClInclude Include="Sample13_Animation.h" />
     <ClInclude Include="Sample1_Cube.h" />
     <ClInclude Include="Sample2_SkyBox.h" />
     <ClInclude Include="Sample3_Light.h" />
@@ -237,6 +278,7 @@
     <ClInclude Include="Sample8_ShadowTest.h" />
     <ClInclude Include="Sample9_ParticleSystem.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SkinMesh.h" />
     <ClInclude Include="SpriteRender.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="xnacollision.h" />
@@ -283,6 +325,16 @@
     <FxCompile Include="Shader\Sample5 CSM\tex2DArrayTest.fx" />
     <FxCompile Include="Shader\Sample6 ParticleSystem\Fire\controlShader.fx" />
     <FxCompile Include="Shader\Sample6 ParticleSystem\Fire\effectShader.fx" />
+    <FxCompile Include="Shader\Sample7 Animation\anime.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assimp\color4.inl" />
+    <None Include="assimp\material.inl" />
+    <None Include="assimp\matrix3x3.inl" />
+    <None Include="assimp\matrix4x4.inl" />
+    <None Include="assimp\quaternion.inl" />
+    <None Include="assimp\vector2.inl" />
+    <None Include="assimp\vector3.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

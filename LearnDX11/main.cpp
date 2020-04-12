@@ -16,11 +16,12 @@
 #include "Sample10_StreamOutTest.h"
 #include "Sample11_CascadedShadowMap.h"
 #include "Sample12_FrustumWithQuadTree.h"
+#include "Sample13_Animation.h"
 
 int main()
 {
 	HINSTANCE hInstance = GetModuleHandle(0);
-	Sample12 sample(hInstance);
+	Sample13 sample(hInstance);
 	if (!sample.Init()) {
 		std::cout << "应用程序初始化错误!!!" << std::endl;
 	}

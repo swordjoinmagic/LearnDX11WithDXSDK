@@ -38,3 +38,17 @@ public:
 public:
 	Particle() { ZeroMemory(this, sizeof(Particle)); }
 };
+
+// 带骨骼的顶点
+struct SkinVertex {
+public:
+	float3 pos;
+	float3 normal;
+	float3 tangent;
+
+	// 最多有4个骨骼影响该顶点
+	int boneID[4] = { 0 };
+	float weights[4] = { 0 };
+
+	float2 texcoord;
+};

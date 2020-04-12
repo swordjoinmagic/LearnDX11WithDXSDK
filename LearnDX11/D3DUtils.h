@@ -19,6 +19,7 @@ typedef XMFLOAT3X3 float3x3;
 typedef XMCOLOR Color;
 typedef UINT uint;
 
+
 #define VK_KEY_A 0x41
 #define VK_KEY_B 0x42
 #define VK_KEY_C 0x43

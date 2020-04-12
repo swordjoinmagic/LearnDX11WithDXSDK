@@ -3,7 +3,6 @@ cbuffer cbPerFrame{
     float gameTime;
     float3 emitDirW;
     float timeStep;
-
 };
 
 Texture1D randomTex;
